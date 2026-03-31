@@ -1,0 +1,8 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, "Segoe UI", Roboto, sans-serif; color: #333; background: #f7f7f7; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.wrap { max-width: 600px; width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.08); text-align: center; padding: 40px; }
+.logo { display: block; max-width: 200px; margin: 0 auto 24px; height: auto; }
+h1 { font-size: 2rem; margin-bottom: 1rem; color: #111; }
+p { font-size: 1.1rem; line-height: 1.55; margin-top: .75rem; }
+a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+.small { margin-top: 1.5rem; color: #666; font-size: 0.9rem; }
