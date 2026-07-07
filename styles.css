@@ -142,9 +142,17 @@ a:hover { text-decoration: underline; }
 .info-contact-line { font-weight: 600; color: #333; }
 .info-contact-line a { margin-left: .25rem; }
 
-.info-map { padding: 0; }
+.info-map {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: #111;
+  min-height: 40vh;
+}
 
-.info-map img { width: 100%; }
+@media (max-width: 768px) {
+  .info-map { background-attachment: scroll; min-height: 260px; }
+}
 
 @media (max-width: 640px) {
   .info-grid { grid-template-columns: 1fr; }
@@ -154,10 +162,8 @@ a:hover { text-decoration: underline; }
 .site-footer {
   background: #fff;
   text-align: center;
-  padding: 60px 20px;
+  padding: 24px 20px;
 }
 
 .site-footer .wrap { max-width: 600px; }
-.site-footer h2 { font-size: 2rem; margin-bottom: 1rem; color: #111; }
-.site-footer p { font-size: 1.1rem; margin-top: .75rem; }
-.site-footer .small { margin-top: 1.5rem; color: #666; font-size: .9rem; }
+.site-footer .small { color: #666; font-size: .9rem; }
