@@ -142,10 +142,9 @@ a:hover { text-decoration: underline; }
 .info-contact-line { font-weight: 600; color: #333; }
 .info-contact-line a { margin-left: .25rem; }
 
-.info-map img {
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.08);
-}
+.info-map { padding: 0; }
+
+.info-map img { width: 100%; }
 
 @media (max-width: 640px) {
   .info-grid { grid-template-columns: 1fr; }
