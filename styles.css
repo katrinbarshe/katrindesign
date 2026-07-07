@@ -27,20 +27,24 @@ a:hover { text-decoration: underline; }
 
 .header-inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 14px;
-  padding-bottom: 14px;
+  gap: 14px;
+  padding-top: 22px;
+  padding-bottom: 16px;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-.brand-logo { width: 32px; height: auto; }
-.brand-name { color: #111; font-size: 1.05rem; }
+.brand { display: flex; align-items: center; }
+.brand-logo { width: 56px; height: auto; }
 
-.site-nav { display: flex; flex-wrap: wrap; gap: 20px; }
-.site-nav a { color: #555; font-weight: 500; font-size: .95rem; }
+.site-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
+.site-nav a {
+  color: #555;
+  font-family: "Barlow", Inter, "Segoe UI", Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: .02em;
+}
 .site-nav a:hover { color: #1a73e8; text-decoration: none; }
 .site-nav a.active { color: #1a73e8; }
 
@@ -48,18 +52,14 @@ a:hover { text-decoration: underline; }
 .hero {
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
   background-color: #111;
+  min-height: 80vh;
 }
 
-.hero-overlay {
-  background: rgba(0,0,0,.45);
-  padding: 90px 0;
-  text-align: center;
-  color: #fff;
+@media (max-width: 768px) {
+  .hero { background-attachment: scroll; min-height: 50vh; }
 }
-
-.hero h1 { font-size: 2.4rem; margin-bottom: .5rem; }
-.hero p { font-size: 1.1rem; color: #eee; }
 
 /* Project sections */
 .project { padding: 64px 0; }
@@ -117,8 +117,6 @@ a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
   .gallery-2col { grid-template-columns: 1fr; }
-  .hero-overlay { padding: 60px 0; }
-  .hero h1 { font-size: 1.8rem; }
 }
 
 /* Info page */
@@ -161,7 +159,6 @@ a:hover { text-decoration: underline; }
 }
 
 .site-footer .wrap { max-width: 600px; }
-.site-footer .logo { max-width: 140px; margin: 0 auto 24px; height: auto; }
 .site-footer h2 { font-size: 2rem; margin-bottom: 1rem; color: #111; }
 .site-footer p { font-size: 1.1rem; margin-top: .75rem; }
 .site-footer .small { margin-top: 1.5rem; color: #666; font-size: .9rem; }
