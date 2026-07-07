@@ -42,6 +42,7 @@ a:hover { text-decoration: underline; }
 .site-nav { display: flex; flex-wrap: wrap; gap: 20px; }
 .site-nav a { color: #555; font-weight: 500; font-size: .95rem; }
 .site-nav a:hover { color: #1a73e8; text-decoration: none; }
+.site-nav a.active { color: #1a73e8; }
 
 /* Hero */
 .hero {
@@ -118,6 +119,38 @@ a:hover { text-decoration: underline; }
   .gallery-2col { grid-template-columns: 1fr; }
   .hero-overlay { padding: 60px 0; }
   .hero h1 { font-size: 1.8rem; }
+}
+
+/* Info page */
+.info-intro { padding-top: 72px; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.info-photo img {
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+.info-text p {
+  color: #555;
+  margin-bottom: 1.1rem;
+}
+
+.info-contact-line { font-weight: 600; color: #333; }
+.info-contact-line a { margin-left: .25rem; }
+
+.info-map img {
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+@media (max-width: 640px) {
+  .info-grid { grid-template-columns: 1fr; }
 }
 
 /* Footer / contact */
