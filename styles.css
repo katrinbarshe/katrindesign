@@ -38,6 +38,52 @@ a:hover { text-decoration: underline; }
 .brand { display: flex; align-items: center; }
 .brand-logo { width: 64px; height: auto; }
 
+.brand-logo .logo-swim {
+  transform-box: view-box;
+  transform-origin: 0px 43.31px;
+  animation: swim-in 1.7s cubic-bezier(.22,1,.36,1) both;
+}
+.brand-logo .logo-head {
+  transform-box: view-box;
+  transform-origin: 118px 43.31px;
+  animation: head-flex 1.7s ease-out both;
+}
+.brand-logo .logo-tail {
+  transform-box: view-box;
+  transform-origin: 56.84px 43.31px;
+  animation: tail-flex 1.8s ease-out both;
+  animation-delay: 0.08s;
+}
+@keyframes swim-in {
+  0%   { transform: translateX(-90px); opacity: 0; }
+  8%   { opacity: 1; }
+  100% { transform: translateX(0px); opacity: 1; }
+}
+@keyframes head-flex {
+  0%   { transform: rotate(0deg); }
+  10%  { transform: rotate(6deg); }
+  25%  { transform: rotate(-4deg); }
+  40%  { transform: rotate(2deg); }
+  55%  { transform: rotate(-1deg); }
+  70%  { transform: rotate(0.5deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes tail-flex {
+  0%   { transform: rotate(0deg); }
+  12%  { transform: rotate(-20deg); }
+  28%  { transform: rotate(14deg); }
+  44%  { transform: rotate(-9deg); }
+  60%  { transform: rotate(5deg); }
+  76%  { transform: rotate(-2deg); }
+  90%  { transform: rotate(1deg); }
+  100% { transform: rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo .logo-swim,
+  .brand-logo .logo-head,
+  .brand-logo .logo-tail { animation: none; opacity: 1; }
+}
+
 .site-nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 32px; }
 .site-nav a {
   color: #555;
