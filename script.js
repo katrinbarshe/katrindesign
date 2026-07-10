@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const targets = document.querySelectorAll('.gallery img, .info-photo img, .project-card-bg');
+  const targets = document.querySelectorAll('.gallery img, .info-photo img, .project-card-bg, .mini-card-bg');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (!('IntersectionObserver' in window) || reduceMotion) {
@@ -18,4 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
 
   targets.forEach((el) => observer.observe(el));
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.more-projects-next').forEach((button) => {
+    const track = button.closest('.more-projects-scroller').querySelector('.more-projects-track');
+    button.addEventListener('click', () => {
+      track.scrollBy({ left: track.clientWidth * 0.8, behavior: 'smooth' });
+    });
+  });
 });
