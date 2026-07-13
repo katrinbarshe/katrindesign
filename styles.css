@@ -1,17 +1,51 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  --bg: #f7f7f7;
+  --text: #333;
+  --heading: #111;
+  --subheading: #222;
+  --muted: #555;
+  --muted-2: #666;
+  --link: #fb0026;
+  --header-bg: #fff;
+  --header-shadow: rgba(0,0,0,.06);
+  --nav-color: #555;
+  --card-bg: #fff;
+  --card-shadow: rgba(0,0,0,.08);
+  --alt-bg: #fff;
+  --footer-bg: #fff;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0a0c;
+  --text: #d8d8d8;
+  --heading: #f5f5f5;
+  --subheading: #e0e0e0;
+  --muted: #aaa;
+  --muted-2: #999;
+  --header-bg: #101013;
+  --header-shadow: rgba(0,0,0,.6);
+  --nav-color: #bbb;
+  --card-bg: #131316;
+  --card-shadow: rgba(0,0,0,.6);
+  --alt-bg: #101013;
+  --footer-bg: #101013;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
   font-family: Inter, "Segoe UI", Roboto, sans-serif;
-  color: #333;
-  background: #f7f7f7;
+  color: var(--text);
+  background: var(--bg);
   line-height: 1.55;
+  transition: background-color .2s ease, color .2s ease;
 }
 
 img { max-width: 100%; display: block; }
 
-a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+a { color: var(--link); text-decoration: none; font-weight: 600; }
 a:hover { text-decoration: underline; }
 
 .wrap { max-width: 1100px; width: 100%; margin: 0 auto; padding: 0 24px; }
@@ -21,8 +55,9 @@ a:hover { text-decoration: underline; }
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  background: var(--header-bg);
+  box-shadow: 0 2px 12px var(--header-shadow);
+  transition: background-color .2s ease;
 }
 
 .header-inner {
@@ -84,16 +119,40 @@ a:hover { text-decoration: underline; }
   .brand-logo .logo-tail { animation: none; opacity: 1; }
 }
 
-.site-nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 32px; }
+.site-nav { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 32px; }
 .site-nav a {
-  color: #555;
+  color: var(--nav-color);
   font-family: "Barlow", Inter, "Segoe UI", Roboto, sans-serif;
   font-weight: 500;
   font-size: 1.05rem;
   letter-spacing: .02em;
 }
-.site-nav a:hover { color: #1a73e8; text-decoration: underline; }
-.site-nav a.active { color: #1a73e8; }
+.site-nav a:hover { color: var(--link); text-decoration: underline; }
+.site-nav a.active { color: var(--link); }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--nav-color);
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.theme-toggle:hover { background: rgba(0,0,0,.06); color: var(--link); }
+[data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,.08); }
+
+.theme-toggle svg { width: 20px; height: 20px; }
+
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 /* Hero */
 .hero {
@@ -145,13 +204,13 @@ a:hover { text-decoration: underline; }
   background-color: transparent;
 }
 
-.hero-light { background-color: #f7f7f7; }
-.hero-light .hero-eyebrow { color: #666; }
+.hero-light { background-color: var(--bg); }
+.hero-light .hero-eyebrow { color: var(--muted-2); }
 .hero-light .hero-title {
-  color: #000;
+  color: var(--heading);
 }
 .hero-light .hero-subhead {
-  color: #333;
+  color: var(--text);
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   max-width: 600px;
@@ -177,8 +236,8 @@ a:hover { text-decoration: underline; }
   border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
-  background: #ffffff;
-  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  background: var(--card-bg);
+  box-shadow: 0 4px 14px var(--card-shadow);
   transition: transform .3s ease, box-shadow .3s ease;
 }
 
@@ -264,8 +323,8 @@ a:hover { text-decoration: underline; }
   overflow: hidden;
   scroll-snap-align: start;
   text-decoration: none;
-  background: #ffffff;
-  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  background: var(--card-bg);
+  box-shadow: 0 3px 10px var(--card-shadow);
   transition: transform .3s ease;
 }
 
@@ -327,14 +386,14 @@ a:hover { text-decoration: underline; }
 .back-link {
   display: inline-block;
   margin-bottom: 24px;
-  color: #666;
+  color: var(--muted-2);
   font-weight: 600;
 }
-.back-link:hover { color: #1a73e8; }
+.back-link:hover { color: var(--link); }
 
 /* Project sections */
 .project { padding: 64px 0; }
-.project-alt { background: #fff; }
+.project-alt { background: var(--alt-bg); }
 
 .project-tag {
   display: inline-block;
@@ -342,19 +401,19 @@ a:hover { text-decoration: underline; }
   letter-spacing: .08em;
   font-size: .8rem;
   font-weight: 600;
-  color: #1a73e8;
+  color: var(--link);
   margin-bottom: .5rem;
 }
 
 .project h2 {
   font-size: 1.8rem;
-  color: #111;
+  color: var(--heading);
   margin-bottom: .75rem;
 }
 
 .subproject h3 {
   font-size: 1.2rem;
-  color: #222;
+  color: var(--subheading);
   margin-top: 2rem;
   margin-bottom: .5rem;
 }
@@ -362,7 +421,7 @@ a:hover { text-decoration: underline; }
 .project-link { margin-bottom: .75rem; }
 
 .project-text {
-  color: #555;
+  color: var(--muted);
   max-width: 760px;
   margin-bottom: 1.5rem;
 }
@@ -482,9 +541,10 @@ a:hover { text-decoration: underline; }
 
 /* Footer / contact */
 .site-footer {
-  background: #ffffff;
+  background: var(--footer-bg);
   text-align: center;
   padding: 24px 20px;
+  transition: background-color .2s ease;
 }
 
 .site-footer .wrap {
@@ -495,7 +555,7 @@ a:hover { text-decoration: underline; }
   gap: 14px;
 }
 
-.site-footer .small { color: #666; font-size: .9rem; }
+.site-footer .small { color: var(--muted-2); font-size: .9rem; }
 
 .back-to-top {
   display: inline-flex;
@@ -504,8 +564,8 @@ a:hover { text-decoration: underline; }
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #f7f7f7;
-  color: #555;
+  background: var(--bg);
+  color: var(--muted);
   font-size: 1.1rem;
   font-weight: 600;
   text-decoration: none;
@@ -513,7 +573,7 @@ a:hover { text-decoration: underline; }
 }
 
 .back-to-top:hover {
-  background: #1a73e8;
+  background: var(--link);
   color: #fff;
   text-decoration: none;
 }
