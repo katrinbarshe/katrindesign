@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicsCoach — Подготовка к тесту на гражданство США</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --surface:#ffffff; --surface-2:#eef1f7;
+    --text:#1c2130; --text-dim:#5b6272; --border:#e2e5ec;
+    --primary:#2f5fd8; --primary-dim:#e8edfc;
+    --good:#1a8a5f; --good-bg:#e5f6ee;
+    --warn:#b3760a; --warn-bg:#fbeed7;
+    --bad:#c23b3b; --bad-bg:#fbe6e6;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,24,40,.06), 0 4px 14px rgba(20,24,40,.06);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14161c; --surface:#1c1f28; --surface-2:#242833;
+      --text:#e9ebf1; --text-dim:#a2a7b5; --border:#2c3040;
+      --primary:#7fa0f5; --primary-dim:#232c47;
+      --good:#5fd6a4; --good-bg:#173427;
+      --warn:#f0c169; --warn-bg:#3a2e14;
+      --bad:#f28b8b; --bad-bg:#3a1c1c;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;}
+  .app{max-width:720px;margin:0 auto;padding:16px 16px 90px;}
+  .site-backbar{max-width:720px;margin:0 auto;padding:10px 16px 0;}
+  .site-backbar a{color:var(--text-dim);font-size:13px;text-decoration:none;}
+  .site-backbar a:hover{color:var(--primary);text-decoration:underline;}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0 14px;}
+  header.top h1{font-size:17px;margin:0;font-weight:700;}
+  .lang-toggle{display:flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;flex-shrink:0;}
+  .lang-toggle button{border:none;background:transparent;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;}
+  .lang-toggle button.active{background:var(--primary);color:#fff;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;}
+  .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow);}
+  .stat .num{font-size:26px;font-weight:800;color:var(--primary);}
+  .stat .lbl{font-size:12px;color:var(--text-dim);margin-top:2px;}
+
+  .ring-wrap{display:flex;align-items:center;gap:16px;}
+  .ring{width:84px;height:84px;flex-shrink:0;}
+  .ring-label{font-size:13px;color:var(--text-dim);}
+  .ring-label b{display:block;font-size:20px;color:var(--text);font-weight:800;}
+
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .menu button.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:left;cursor:pointer;box-shadow:var(--shadow);font-family:inherit;}
+  .menu button.tile .emoji{font-size:22px;}
+  .menu button.tile .t{font-weight:700;font-size:14px;margin-top:6px;}
+  .menu button.tile .d{font-size:12px;color:var(--text-dim);margin-top:2px;line-height:1.3;}
+
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:center;z-index:20;}
+  nav.tabs .inner{max-width:720px;width:100%;display:flex;}
+  nav.tabs button{flex:1;background:none;border:none;padding:10px 4px 8px;font-size:10.5px;color:var(--text-dim);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  nav.tabs button .ic{font-size:18px;}
+  nav.tabs button.active{color:var(--primary);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn.secondary{background:var(--surface-2);color:var(--text);}
+  .btn.ghost{background:transparent;color:var(--primary);padding:8px 10px;}
+  .btn.good{background:var(--good);}
+  .btn.bad{background:var(--bad);}
+  .btn:disabled{opacity:.45;cursor:default;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row.between{justify-content:space-between;align-items:center;}
+
+  .backbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .backbar button{background:none;border:none;color:var(--primary);font-size:14px;font-weight:600;cursor:pointer;padding:4px 0;font-family:inherit;}
+  .backbar h2{font-size:16px;margin:0;}
+
+  .progressbar{height:8px;border-radius:6px;background:var(--surface-2);overflow:hidden;}
+  .progressbar > div{height:100%;background:var(--primary);border-radius:6px;transition:width .3s;}
+
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;}
+  .badge.new{background:var(--surface-2);color:var(--text-dim);}
+  .badge.good{background:var(--good-bg);color:var(--good);}
+  .badge.warn{background:var(--warn-bg);color:var(--warn);}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);}
+
+  .flash{min-height:260px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none;}
+  .flash .qnum{font-size:12px;color:var(--text-dim);font-weight:700;}
+  .flash .qtext{font-size:19px;font-weight:700;line-height:1.4;margin:14px 0;}
+  .flash .qtext-ru{font-size:14px;color:var(--text-dim);font-weight:500;margin-top:6px;}
+  .flash .ans{border-top:1px dashed var(--border);padding-top:12px;margin-top:8px;}
+  .flash .ans ul{margin:6px 0 0;padding-left:18px;}
+  .flash .ans li{margin-bottom:4px;font-size:15px;}
+  .flash .ans-ru{color:var(--text-dim);font-size:13px;}
+  .flash .hint{text-align:center;font-size:12px;color:var(--text-dim);}
+  .speak-btn{background:var(--surface-2);border:none;border-radius:8px;padding:6px 9px;cursor:pointer;font-size:14px;}
+
+  .quiz-opt{display:block;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:9px;cursor:pointer;font-size:14.5px;font-family:inherit;color:var(--text);}
+  .quiz-opt.correct{border-color:var(--good);background:var(--good-bg);}
+  .quiz-opt.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  .quiz-opt:disabled{cursor:default;}
+
+  select,input[type=text]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;margin-top:5px;}
+  label.field{display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-top:14px;}
+  .field-hint{font-size:11.5px;color:var(--text-dim);margin-top:3px;line-height:1.4;}
+
+  .catbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .catbar .name{font-size:13.5px;font-weight:700;}
+  .catbar .pct{font-size:12px;color:var(--text-dim);}
+
+  .empty{text-align:center;padding:40px 10px;color:var(--text-dim);}
+  .empty .big{font-size:34px;margin-bottom:10px;}
+
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:50;box-shadow:var(--shadow);}
+
+  h3.sect{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);margin:20px 0 8px;}
+  p.lead{color:var(--text-dim);font-size:13.5px;line-height:1.5;margin-top:0;}
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+  a{color:var(--primary);}
+</style>
+</head>
+<body>
+<div class="site-backbar"><a href="civicscoach-project.html">&larr; katrindesign.com</a></div>
+<div class="app" id="app"></div>
+<div id="toast-holder"></div>
+
+<nav class="tabs">
+  <div class="inner">
+    <button data-tab="dashboard" class="tabbtn"><span class="ic">🏠</span>Главная</button>
+    <button data-tab="flashcards" class="tabbtn"><span class="ic">🗂️</span>Карточки</button>
+    <button data-tab="quiz" class="tabbtn"><span class="ic">✅</span>Квиз</button>
+    <button data-tab="mock" class="tabbtn"><span class="ic">🎤</span>Интервью</button>
+    <button data-tab="settings" class="tabbtn"><span class="ic">⚙️</span>Настройки</button>
+  </div>
+</nav>
+
+<script>
+const QUESTIONS = [{"id": 1, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "What is the form of government of the United States?", "en_a": ["Republic", "Constitution-based federal republic", "Representative democracy"], "ru_q": "Какая форма правления в США?", "ru_a": ["Республика", "Конституционная федеративная республика", "Представительная демократия"]}, {"id": 2, "section": "government", "subsection": "Principles of American Government", "exempt6520": true, "personalized": null, "en_q": "What is the supreme law of the land?", "en_a": ["(U.S.) Constitution"], "ru_q": "Какой закон является высшим законом страны?", "ru_a": ["Конституция США"]}, {"id": 3, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "Name one thing the U.S. Constitution does.", "en_a": ["Forms the government", "Defines powers of government", "Defines the parts of government", "Protects the rights of the people"], "ru_q": "Назовите одну вещь, которую делает Конституция США.", "ru_a": ["Формирует правительство", "Определяет полномочия власти", "Определяет устройство власти", "Защищает права народа"]}, {"id": 4, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "The U.S. Constitution starts with the words \"We the People.\" What does \"We the People\" mean?", "en_a": ["Self-government", "Popular sovereignty", "Consent of the governed", "People should govern themselves", "(Example of) social contract"], "ru_q": "Конституция США начинается со слов «Мы, народ» (We the People). Что это значит?", "ru_a": ["Самоуправление", "Народный суверенитет", "Согласие управляемых", "Народ должен управлять собой", "Пример общественного договора"]}, {"id": 5, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "How are changes made to the U.S. Constitution?", "en_a": ["Amendments", "The amendment process"], "ru_q": "Как вносятся изменения в Конституцию США?", "ru_a": ["Через поправки", "Через процесс внесения поправок"]}, {"id": 6, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "What does the Bill of Rights protect?", "en_a": ["(The basic) rights of Americans", "(The basic) rights of people living in the United States"], "ru_q": "Что защищает Билль о правах?", "ru_a": ["Основные права американцев", "Основные права людей, живущих в США"]}, {"id": 7, "section": "government", "subsection": "Principles of American Government", "exempt6520": true, "personalized": null, "en_q": "How many amendments does the U.S. Constitution have?", "en_a": ["Twenty-seven (27)"], "ru_q": "Сколько поправок в Конституции США?", "ru_a": ["Двадцать семь (27)"]}, {"id": 8, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "Why is the Declaration of Independence important?", "en_a": ["It says America is free from British control.", "It says all people are created equal.", "It identifies inherent rights.", "It identifies individual freedoms."], "ru_q": "Почему важна Декларация независимости?", "ru_a": ["Она провозглашает независимость Америки от Британии", "Она провозглашает равенство всех людей", "Она определяет неотъемлемые права", "Она определяет личные свободы"]}, {"id": 9, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "What founding document said the American colonies were free from Britain?", "en_a": ["Declaration of Independence"], "ru_q": "Какой основополагающий документ провозгласил независимость американских колоний от Британии?", "ru_a": ["Декларация независимости"]}, {"id": 10, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "Name two important ideas from the Declaration of Independence and the U.S. Constitution.", "en_a": ["Equality", "Liberty", "Social contract", "Natural rights", "Limited government", "Self-government"], "ru_q": "Назовите две важные идеи из Декларации независимости и Конституции США.", "ru_a": ["Равенство", "Свобода", "Общественный договор", "Естественные права", "Ограниченное правительство", "Самоуправление"]}, {"id": 11, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "The words \"Life, Liberty, and the pursuit of Happiness\" are in what founding document?", "en_a": ["Declaration of Independence"], "ru_q": "В каком основополагающем документе есть слова «Жизнь, Свобода и стремление к Счастью»?", "ru_a": ["В Декларации независимости"]}, {"id": 12, "section": "government", "subsection": "Principles of American Government", "exempt6520": true, "personalized": null, "en_q": "What is the economic system of the United States?", "en_a": ["Capitalism", "Free market economy"], "ru_q": "Какая экономическая система в США?", "ru_a": ["Капитализм", "Рыночная экономика"]}, {"id": 13, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "What is the rule of law?", "en_a": ["Everyone must follow the law.", "Leaders must obey the law.", "Government must obey the law.", "No one is above the law."], "ru_q": "Что такое верховенство закона?", "ru_a": ["Все обязаны соблюдать закон", "Лидеры тоже обязаны подчиняться закону", "Правительство тоже обязано подчиняться закону", "Никто не выше закона"]}, {"id": 14, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "Many documents influenced the U.S. Constitution. Name one.", "en_a": ["Declaration of Independence", "Articles of Confederation", "Federalist Papers", "Anti-Federalist Papers", "Virginia Declaration of Rights", "Fundamental Orders of Connecticut", "Mayflower Compact", "Iroquois Great Law of Peace"], "ru_q": "Многие документы повлияли на Конституцию США. Назовите один.", "ru_a": ["Декларация независимости", "Статьи Конфедерации", "«Записки федералиста»", "«Записки антифедералиста»", "Виргинская декларация прав", "Основные законы Коннектикута", "Мэйфлауэрское соглашение", "Великий закон мира ирокезов"]}, {"id": 15, "section": "government", "subsection": "Principles of American Government", "exempt6520": false, "personalized": null, "en_q": "There are three branches of government. Why?", "en_a": ["So one part does not become too powerful", "Checks and balances", "Separation of powers"], "ru_q": "В США три ветви власти. Почему?", "ru_a": ["Чтобы ни одна из них не стала слишком сильной", "Система сдержек и противовесов", "Разделение властей"]}, {"id": 16, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Name the three branches of government.", "en_a": ["Legislative, executive, and judicial", "Congress, president, and the courts"], "ru_q": "Назовите три ветви власти.", "ru_a": ["Законодательная, исполнительная и судебная", "Конгресс, президент и суды"]}, {"id": 17, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "The President of the United States is in charge of which branch of government?", "en_a": ["Executive branch"], "ru_q": "Какую ветвь власти возглавляет президент США?", "ru_a": ["Исполнительную власть"]}, {"id": 18, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What part of the federal government writes laws?", "en_a": ["(U.S.) Congress", "(U.S. or national) legislature", "Legislative branch"], "ru_q": "Какая часть федерального правительства пишет законы?", "ru_a": ["Конгресс США", "Законодательная власть"]}, {"id": 19, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What are the two parts of the U.S. Congress?", "en_a": ["Senate and House (of Representatives)"], "ru_q": "Из каких двух палат состоит Конгресс США?", "ru_a": ["Сенат и Палата представителей"]}, {"id": 20, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": null, "en_q": "Name one power of the U.S. Congress.", "en_a": ["Writes laws", "Declares war", "Makes the federal budget"], "ru_q": "Назовите одно полномочие Конгресса США.", "ru_a": ["Пишет законы", "Объявляет войну", "Формирует федеральный бюджет"]}, {"id": 21, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How many U.S. senators are there?", "en_a": ["One hundred (100)"], "ru_q": "Сколько сенаторов США?", "ru_a": ["Сто (100)"]}, {"id": 22, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How long is a term for a U.S. senator?", "en_a": ["Six (6) years"], "ru_q": "На какой срок избирается сенатор США?", "ru_a": ["Шесть (6) лет"]}, {"id": 23, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": "senator", "en_q": "Who is one of your state's U.S. senators now?", "en_a": ["Answers will vary. (D.C. or territory residents: your area has no U.S. senators.)"], "ru_q": "Кто сейчас один из сенаторов США от вашего штата?", "ru_a": ["Зависит от штата — впишите своего сенатора. (Жители округа Колумбия или территорий: у вас нет сенаторов США.)"]}, {"id": 24, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How many voting members are in the House of Representatives?", "en_a": ["Four hundred thirty-five (435)"], "ru_q": "Сколько членов с правом голоса в Палате представителей?", "ru_a": ["Четыреста тридцать пять (435)"]}, {"id": 25, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How long is a term for a member of the House of Representatives?", "en_a": ["Two (2) years"], "ru_q": "На какой срок избирается член Палаты представителей?", "ru_a": ["Два (2) года"]}, {"id": 26, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Why do U.S. representatives serve shorter terms than U.S. senators?", "en_a": ["To more closely follow public opinion"], "ru_q": "Почему у представителей более короткий срок полномочий, чем у сенаторов?", "ru_a": ["Чтобы точнее отражать текущее мнение избирателей"]}, {"id": 27, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How many senators does each state have?", "en_a": ["Two (2)"], "ru_q": "Сколько сенаторов от каждого штата?", "ru_a": ["Два (2)"]}, {"id": 28, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Why does each state have two senators?", "en_a": ["Equal representation (for small states)", "The Great Compromise (Connecticut Compromise)"], "ru_q": "Почему у каждого штата по два сенатора?", "ru_a": ["Равное представительство для небольших штатов", "«Великий компромисс» (Коннектикутский компромисс)"]}, {"id": 29, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": "representative", "en_q": "Name your U.S. representative.", "en_a": ["Answers will vary. (Territory residents: name your Delegate/Commissioner, or state you have no voting representative.)"], "ru_q": "Назовите вашего представителя в Конгрессе.", "ru_a": ["Зависит от округа — впишите своего представителя"]}, {"id": 30, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": "current", "en_q": "What is the name of the Speaker of the House of Representatives now?", "en_a": ["(Check uscis.gov/citizenship/testupdates for the current name.)", "Mike Johnson (as of 2026)"], "ru_q": "Кто сейчас спикер Палаты представителей?", "ru_a": ["Майк Джонсон (Mike Johnson) — по состоянию на 2026 год; проверьте актуальное имя ближе к интервью"]}, {"id": 31, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who does a U.S. senator represent?", "en_a": ["Citizens of their state", "People of their state"], "ru_q": "Кого представляет сенатор США?", "ru_a": ["Граждан своего штата"]}, {"id": 32, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who elects U.S. senators?", "en_a": ["Citizens from their state"], "ru_q": "Кто избирает сенаторов США?", "ru_a": ["Граждане своего штата"]}, {"id": 33, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who does a member of the House of Representatives represent?", "en_a": ["Citizens in their (congressional) district", "People in their district"], "ru_q": "Кого представляет член Палаты представителей?", "ru_a": ["Жителей своего избирательного округа"]}, {"id": 34, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who elects members of the House of Representatives?", "en_a": ["Citizens from their (congressional) district"], "ru_q": "Кто избирает членов Палаты представителей?", "ru_a": ["Граждане своего избирательного округа"]}, {"id": 35, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Some states have more representatives than other states. Why?", "en_a": ["(Because of) the state's population", "(Because) they have more people", "(Because) some states have more people"], "ru_q": "Почему у некоторых штатов больше представителей, чем у других?", "ru_a": ["Из-за численности населения штата", "Потому что в них живёт больше людей"]}, {"id": 36, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": null, "en_q": "The President of the United States is elected for how many years?", "en_a": ["Four (4) years"], "ru_q": "На какой срок избирается президент США?", "ru_a": ["Четыре (4) года"]}, {"id": 37, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "The President of the United States can serve only two terms. Why?", "en_a": ["(Because of) the 22nd Amendment", "To keep the president from becoming too powerful"], "ru_q": "Президент США может занимать пост не более двух сроков. Почему?", "ru_a": ["Из-за 22-й поправки к Конституции", "Чтобы президент не стал слишком влиятельным"]}, {"id": 38, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": "current", "en_q": "What is the name of the President of the United States now?", "en_a": ["(Check uscis.gov/citizenship/testupdates for the current name.)", "Donald Trump (as of 2026)"], "ru_q": "Как зовут нынешнего президента США?", "ru_a": ["Дональд Трамп (Donald Trump) — по состоянию на 2026 год; проверьте актуальное имя ближе к интервью"]}, {"id": 39, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": "current", "en_q": "What is the name of the Vice President of the United States now?", "en_a": ["(Check uscis.gov/citizenship/testupdates for the current name.)", "JD Vance (as of 2026)"], "ru_q": "Как зовут нынешнего вице-президента США?", "ru_a": ["Джей Ди Вэнс (JD Vance) — по состоянию на 2026 год; проверьте актуальное имя ближе к интервью"]}, {"id": 40, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "If the president can no longer serve, who becomes president?", "en_a": ["The Vice President (of the United States)"], "ru_q": "Кто становится президентом, если действующий президент не может исполнять обязанности?", "ru_a": ["Вице-президент"]}, {"id": 41, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Name one power of the president.", "en_a": ["Signs bills into law", "Vetoes bills", "Enforces laws", "Commander in Chief (of the military)", "Chief diplomat", "Appoints federal judges"], "ru_q": "Назовите одно полномочие президента.", "ru_a": ["Подписывает законопроекты", "Накладывает вето на законопроекты", "Обеспечивает исполнение законов", "Главнокомандующий вооружёнными силами", "Назначает федеральных судей"]}, {"id": 42, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who is Commander in Chief of the U.S. military?", "en_a": ["The President (of the United States)"], "ru_q": "Кто главнокомандующий вооружёнными силами США?", "ru_a": ["Президент"]}, {"id": 43, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who signs bills to become laws?", "en_a": ["The President (of the United States)"], "ru_q": "Кто подписывает законопроекты, чтобы они стали законом?", "ru_a": ["Президент"]}, {"id": 44, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": null, "en_q": "Who vetoes bills?", "en_a": ["The President (of the United States)"], "ru_q": "Кто накладывает вето на законопроекты?", "ru_a": ["Президент"]}, {"id": 45, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Who appoints federal judges?", "en_a": ["The President (of the United States)"], "ru_q": "Кто назначает федеральных судей?", "ru_a": ["Президент"]}, {"id": 46, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "The executive branch has many parts. Name one.", "en_a": ["President (of the United States)", "Cabinet", "Federal departments and agencies"], "ru_q": "У исполнительной власти много частей. Назовите одну.", "ru_a": ["Президент", "Кабинет министров", "Федеральные ведомства и агентства"]}, {"id": 47, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What does the President's Cabinet do?", "en_a": ["Advises the President (of the United States)"], "ru_q": "Чем занимается Кабинет президента?", "ru_a": ["Консультирует президента"]}, {"id": 48, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What are two Cabinet-level positions?", "en_a": ["Attorney General", "Secretary of Agriculture", "Secretary of Commerce", "Secretary of Education", "Secretary of Energy", "Secretary of Health and Human Services", "Secretary of Homeland Security", "Secretary of Housing and Urban Development", "Secretary of the Interior", "Secretary of Labor", "Secretary of State", "Secretary of Transportation", "Secretary of the Treasury", "Secretary of Veterans Affairs", "Secretary of War (Defense)", "Vice-President", "Administrator of the EPA", "Administrator of the Small Business Administration", "Director of the CIA", "Director of the Office of Management and Budget", "Director of National Intelligence", "United States Trade Representative"], "ru_q": "Назовите две должности кабинетного уровня.", "ru_a": ["Генеральный прокурор", "Министр сельского хозяйства", "Министр торговли", "Министр образования", "Министр энергетики", "Министр здравоохранения", "Министр внутренней безопасности", "Министр жилищного и городского строительства", "Министр внутренних дел", "Министр труда", "Госсекретарь", "Министр транспорта", "Министр финансов", "Министр по делам ветеранов", "Военный министр (Министр обороны)", "Вице-президент", "Директор ЦРУ"]}, {"id": 49, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Why is the Electoral College important?", "en_a": ["It decides who is elected president.", "It provides a compromise between the popular election of the president and congressional selection."], "ru_q": "Почему важна Коллегия выборщиков?", "ru_a": ["Она определяет, кто избран президентом", "Это компромисс между всенародным голосованием и выбором Конгрессом"]}, {"id": 50, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What is one part of the judicial branch?", "en_a": ["Supreme Court", "Federal Courts"], "ru_q": "Назовите одну часть судебной власти.", "ru_a": ["Верховный суд", "Федеральные суды"]}, {"id": 51, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What does the judicial branch do?", "en_a": ["Reviews laws", "Explains laws", "Resolves disputes (disagreements) about the law", "Decides if a law goes against the (U.S.) Constitution"], "ru_q": "Чем занимается судебная власть?", "ru_a": ["Рассматривает законы", "Разъясняет законы", "Разрешает споры о праве", "Решает, противоречит ли закон Конституции"]}, {"id": 52, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": null, "en_q": "What is the highest court in the United States?", "en_a": ["Supreme Court"], "ru_q": "Какой суд является высшим в США?", "ru_a": ["Верховный суд"]}, {"id": 53, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How many seats are on the Supreme Court?", "en_a": ["Nine (9)"], "ru_q": "Сколько мест в Верховном суде?", "ru_a": ["Девять (9)"]}, {"id": 54, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How many Supreme Court justices are usually needed to decide a case?", "en_a": ["Five (5)"], "ru_q": "Сколько судей обычно требуется, чтобы принять решение по делу?", "ru_a": ["Пять (5)"]}, {"id": 55, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "How long do Supreme Court justices serve?", "en_a": ["(For) life", "Lifetime appointment", "(Until) retirement"], "ru_q": "Сколько служат судьи Верховного суда?", "ru_a": ["Пожизненно", "До выхода в отставку"]}, {"id": 56, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Supreme Court justices serve for life. Why?", "en_a": ["To be independent (of politics)", "To limit outside (political) influence"], "ru_q": "Судьи Верховного суда служат пожизненно. Почему?", "ru_a": ["Чтобы быть независимыми от политики", "Чтобы ограничить внешнее политическое влияние"]}, {"id": 57, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": "current", "en_q": "Who is the Chief Justice of the United States now?", "en_a": ["(Check uscis.gov/citizenship/testupdates for the current name.)", "John Roberts (as of 2026)"], "ru_q": "Кто сейчас председатель Верховного суда США?", "ru_a": ["Джон Робертс (John Roberts) — по состоянию на 2026 год; проверьте актуальное имя ближе к интервью"]}, {"id": 58, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Name one power that is only for the federal government.", "en_a": ["Print paper money", "Mint coins", "Declare war", "Create an army", "Make treaties", "Set foreign policy"], "ru_q": "Назовите одно полномочие, которое есть только у федерального правительства.", "ru_a": ["Печатать бумажные деньги", "Чеканить монеты", "Объявлять войну", "Создавать армию", "Заключать международные договоры", "Определять внешнюю политику"]}, {"id": 59, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "Name one power that is only for the states.", "en_a": ["Provide schooling and education", "Provide protection (police)", "Provide safety (fire departments)", "Give a driver's license", "Approve zoning and land use"], "ru_q": "Назовите одно полномочие, которое есть только у штатов.", "ru_a": ["Организация школьного образования", "Полиция", "Пожарная охрана", "Выдача водительских прав", "Зонирование и землепользование"]}, {"id": 60, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": null, "en_q": "What is the purpose of the 10th Amendment?", "en_a": ["(It states that the) powers not given to the federal government belong to the states or to the people."], "ru_q": "Какова цель 10-й поправки?", "ru_a": ["Полномочия, не переданные федеральному правительству, принадлежат штатам или народу"]}, {"id": 61, "section": "government", "subsection": "System of Government", "exempt6520": true, "personalized": "governor", "en_q": "Who is the governor of your state now?", "en_a": ["Answers will vary. (D.C. residents: D.C. does not have a governor.)"], "ru_q": "Кто сейчас губернатор вашего штата?", "ru_a": ["Зависит от штата — впишите своего губернатора"]}, {"id": 62, "section": "government", "subsection": "System of Government", "exempt6520": false, "personalized": "capital", "en_q": "What is the capital of your state?", "en_a": ["Answers will vary. (D.C. residents: D.C. is not a state and has no capital; territory residents: name the territory's capital.)"], "ru_q": "Какая столица вашего штата?", "ru_a": ["Зависит от штата — впишите столицу"]}, {"id": 63, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "There are four amendments to the U.S. Constitution about who can vote. Describe one of them.", "en_a": ["Citizens eighteen (18) and older (can vote).", "You don't have to pay (a poll tax) to vote.", "Any citizen can vote. (Women and men can vote.)", "A male citizen of any race (can vote)."], "ru_q": "Есть четыре поправки к Конституции о том, кто может голосовать. Опишите одну из них.", "ru_a": ["Граждане от 18 лет могут голосовать", "Не нужно платить избирательный налог, чтобы голосовать", "Голосовать может любой гражданин (и женщины, и мужчины)", "Мужчина любой расы может голосовать"]}, {"id": 64, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "Who can vote in federal elections, run for federal office, and serve on a jury in the United States?", "en_a": ["Citizens", "Citizens of the United States", "U.S. citizens"], "ru_q": "Кто может голосовать на федеральных выборах, баллотироваться на федеральные должности и быть присяжным в США?", "ru_a": ["Граждане США"]}, {"id": 65, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "What are three rights of everyone living in the United States?", "en_a": ["Freedom of expression", "Freedom of speech", "Freedom of assembly", "Freedom to petition the government", "Freedom of religion", "The right to bear arms"], "ru_q": "Назовите три права, которыми обладает каждый, кто живёт в США.", "ru_a": ["Свобода самовыражения", "Свобода слова", "Свобода собраний", "Право обращаться к правительству", "Свобода вероисповедания", "Право на ношение оружия"]}, {"id": 66, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": true, "personalized": null, "en_q": "What do we show loyalty to when we say the Pledge of Allegiance?", "en_a": ["The United States", "The flag"], "ru_q": "Чему мы демонстрируем верность, произнося Клятву верности флагу?", "ru_a": ["Соединённым Штатам", "Флагу"]}, {"id": 67, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "Name two promises that new citizens make in the Oath of Allegiance.", "en_a": ["Give up loyalty to other countries", "Defend the (U.S.) Constitution", "Obey the laws of the United States", "Serve in the military (if needed)", "Serve (help, do important work for) the nation (if needed)", "Be loyal to the United States"], "ru_q": "Назовите два обещания, которые новые граждане дают в Присяге на верность.", "ru_a": ["Отказаться от верности другим странам", "Защищать Конституцию", "Соблюдать законы США", "Служить в армии при необходимости", "Выполнять важную работу для страны при необходимости", "Быть верным США"]}, {"id": 68, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "How can people become United States citizens?", "en_a": ["Be born in the United States, under the conditions set by the 14th Amendment", "Naturalize", "Derive citizenship (under conditions set by Congress)"], "ru_q": "Как люди могут стать гражданами США?", "ru_a": ["Родиться в США (на условиях 14-й поправки)", "Пройти натурализацию", "Получить гражданство через родителей (на условиях, установленных Конгрессом)"]}, {"id": 69, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "What are two examples of civic participation in the United States?", "en_a": ["Vote", "Run for office", "Join a political party", "Help with a campaign", "Join a civic group", "Join a community group", "Give an elected official your opinion (on an issue)", "Contact elected officials", "Support or oppose an issue or policy", "Write to a newspaper"], "ru_q": "Назовите два примера гражданского участия в США.", "ru_a": ["Голосовать", "Баллотироваться на выборах", "Вступить в политическую партию", "Помогать в предвыборной кампании", "Вступить в общественную организацию", "Обращаться к выборным должностным лицам", "Поддерживать или выступать против конкретной политики"]}, {"id": 70, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "What is one way Americans can serve their country?", "en_a": ["Vote", "Pay taxes", "Obey the law", "Serve in the military", "Run for office", "Work for local, state, or federal government"], "ru_q": "Назовите один способ, которым американцы могут служить своей стране.", "ru_a": ["Голосовать", "Платить налоги", "Соблюдать закон", "Служить в армии", "Баллотироваться на выборах", "Работать в органах власти"]}, {"id": 71, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "Why is it important to pay federal taxes?", "en_a": ["Required by law", "All people pay to fund the federal government", "Required by the (U.S.) Constitution (16th Amendment)", "Civic duty"], "ru_q": "Почему важно платить федеральные налоги?", "ru_a": ["Это требование закона", "Все платят, чтобы финансировать федеральное правительство", "Требование Конституции (16-я поправка)", "Гражданский долг"]}, {"id": 72, "section": "government", "subsection": "Rights and Responsibilities", "exempt6520": false, "personalized": null, "en_q": "It is important for all men age 18 through 25 to register for the Selective Service. Name one reason why.", "en_a": ["Required by law", "Civic duty", "Makes the draft fair, if needed"], "ru_q": "Мужчинам от 18 до 25 лет важно регистрироваться в Selective Service (учёт на случай призыва). Назовите одну причину почему.", "ru_a": ["Это требование закона", "Гражданский долг", "Делает призыв справедливым, если он понадобится"]}, {"id": 73, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "The colonists came to America for many reasons. Name one.", "en_a": ["Freedom", "Political liberty", "Religious freedom", "Economic opportunity", "Escape persecution"], "ru_q": "Колонисты приезжали в Америку по многим причинам. Назовите одну.", "ru_a": ["Свобода", "Политическая свобода", "Свобода вероисповедания", "Экономические возможности", "Спасение от преследований"]}, {"id": 74, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": true, "personalized": null, "en_q": "Who lived in America before the Europeans arrived?", "en_a": ["American Indians", "Native Americans"], "ru_q": "Кто жил в Америке до прибытия европейцев?", "ru_a": ["Американские индейцы", "Коренные американцы"]}, {"id": 75, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "What group of people was taken and sold as slaves?", "en_a": ["Africans", "People from Africa"], "ru_q": "Каких людей привозили и продавали в рабство?", "ru_a": ["Африканцев", "Людей из Африки"]}, {"id": 76, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "What war did the Americans fight to win independence from Britain?", "en_a": ["American Revolution", "The (American) Revolutionary War", "War for (American) Independence"], "ru_q": "Какую войну вели американцы, чтобы добиться независимости от Британии?", "ru_a": ["Американскую революцию", "Войну за независимость"]}, {"id": 77, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "Name one reason why the Americans declared independence from Britain.", "en_a": ["High taxes", "Taxation without representation", "British soldiers stayed in Americans' houses (boarding, quartering)", "They did not have self-government", "Boston Massacre", "Boston Tea Party (Tea Act)", "Stamp Act", "Sugar Act", "Townshend Acts", "Intolerable (Coercive) Acts"], "ru_q": "Назовите одну причину, по которой американцы объявили независимость от Британии.", "ru_a": ["Высокие налоги", "Налогообложение без представительства", "Британские солдаты, размещённые в домах американцев", "Отсутствие самоуправления", "«Бостонская бойня»", "«Бостонское чаепитие» (Закон о чае)", "Гербовый акт", "Сахарный акт", "Акты Тауншенда", "«Невыносимые законы»"]}, {"id": 78, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": true, "personalized": null, "en_q": "Who wrote the Declaration of Independence?", "en_a": ["(Thomas) Jefferson"], "ru_q": "Кто написал Декларацию независимости?", "ru_a": ["Томас Джефферсон"]}, {"id": 79, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "When was the Declaration of Independence adopted?", "en_a": ["July 4, 1776"], "ru_q": "Когда была принята Декларация независимости?", "ru_a": ["4 июля 1776 года"]}, {"id": 80, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "The American Revolution had many important events. Name one.", "en_a": ["(Battle of) Bunker Hill", "Declaration of Independence", "Washington Crossing the Delaware (Battle of Trenton)", "(Battle of) Saratoga", "Valley Forge (Encampment)", "(Battle of) Yorktown (British surrender at Yorktown)"], "ru_q": "У Американской революции было много важных событий. Назовите одно.", "ru_a": ["Битва при Бункер-Хилл", "Подписание Декларации независимости", "Переправа Вашингтона через Делавэр (битва при Трентоне)", "Битва при Саратоге", "Зимовка в Вэлли-Фордж", "Капитуляция в Йорктауне"]}, {"id": 81, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "There were 13 original states. Name five.", "en_a": ["New Hampshire", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania", "Delaware", "Maryland", "Virginia", "North Carolina", "South Carolina", "Georgia"], "ru_q": "Было 13 первых штатов. Назовите пять.", "ru_a": ["Нью-Гэмпшир", "Массачусетс", "Род-Айленд", "Коннектикут", "Нью-Йорк", "Нью-Джерси", "Пенсильвания", "Делавэр", "Мэриленд", "Виргиния", "Северная Каролина", "Южная Каролина", "Джорджия"]}, {"id": 82, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "What founding document was written in 1787?", "en_a": ["(U.S.) Constitution"], "ru_q": "Какой основополагающий документ был написан в 1787 году?", "ru_a": ["Конституция США"]}, {"id": 83, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.", "en_a": ["(James) Madison", "(Alexander) Hamilton", "(John) Jay", "Publius"], "ru_q": "«Записки федералиста» поддержали принятие Конституции США. Назовите одного из авторов.", "ru_a": ["Джеймс Мэдисон", "Александр Гамильтон", "Джон Джей", "Публий (псевдоним)"]}, {"id": 84, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "Why were the Federalist Papers important?", "en_a": ["They helped people understand the (U.S.) Constitution.", "They supported passing the (U.S.) Constitution."], "ru_q": "Почему были важны «Записки федералиста»?", "ru_a": ["Они помогли людям понять Конституцию", "Они способствовали принятию Конституции"]}, {"id": 85, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "Benjamin Franklin is famous for many things. Name one.", "en_a": ["Founded the first free public libraries", "First Postmaster General of the United States", "Helped write the Declaration of Independence", "Inventor", "U.S. diplomat"], "ru_q": "Бенджамин Франклин известен многим. Назовите одно из его достижений.", "ru_a": ["Основал первые бесплатные публичные библиотеки", "Первый генеральный почтмейстер США", "Помогал писать Декларацию независимости", "Изобретатель", "Дипломат США"]}, {"id": 86, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": true, "personalized": null, "en_q": "George Washington is famous for many things. Name one.", "en_a": ["\"Father of Our Country\"", "First president of the United States", "General of the Continental Army", "President of the Constitutional Convention"], "ru_q": "Джордж Вашингтон известен многим. Назовите одно из его достижений.", "ru_a": ["«Отец нации»", "Первый президент США", "Главнокомандующий Континентальной армии", "Председатель Конституционного конвента"]}, {"id": 87, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "Thomas Jefferson is famous for many things. Name one.", "en_a": ["Writer of the Declaration of Independence", "Third president of the United States", "Doubled the size of the United States (Louisiana Purchase)", "First Secretary of State", "Founded the University of Virginia", "Writer of the Virginia Statute on Religious Freedom"], "ru_q": "Томас Джефферсон известен многим. Назовите одно из его достижений.", "ru_a": ["Автор Декларации независимости", "Третий президент США", "Удвоил территорию США (Луизианская покупка)", "Первый госсекретарь США", "Основал Университет Виргинии"]}, {"id": 88, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "James Madison is famous for many things. Name one.", "en_a": ["\"Father of the Constitution\"", "Fourth president of the United States", "President during the War of 1812", "One of the writers of the Federalist Papers"], "ru_q": "Джеймс Мэдисон известен многим. Назовите одно из его достижений.", "ru_a": ["«Отец Конституции»", "Четвёртый президент США", "Президент во время войны 1812 года", "Один из авторов «Записок федералиста»"]}, {"id": 89, "section": "history", "subsection": "Colonial Period and Independence", "exempt6520": false, "personalized": null, "en_q": "Alexander Hamilton is famous for many things. Name one.", "en_a": ["First Secretary of the Treasury", "One of the writers of the Federalist Papers", "Helped establish the First Bank of the United States", "Aide to General Washington", "Member of the Continental Congress"], "ru_q": "Александр Гамильтон известен многим. Назовите одно из его достижений.", "ru_a": ["Первый министр финансов США", "Один из авторов «Записок федералиста»", "Помог создать Первый банк США", "Адъютант генерала Вашингтона", "Член Континентального конгресса"]}, {"id": 90, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "What territory did the United States buy from France in 1803?", "en_a": ["Louisiana Territory", "Louisiana"], "ru_q": "Какую территорию США купили у Франции в 1803 году?", "ru_a": ["Луизианскую территорию", "Луизиану"]}, {"id": 91, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "Name one war fought by the United States in the 1800s.", "en_a": ["War of 1812", "Mexican-American War", "Civil War", "Spanish-American War"], "ru_q": "Назовите одну войну, которую США вели в XIX веке.", "ru_a": ["Война 1812 года", "Американо-мексиканская война", "Гражданская война", "Испано-американская война"]}, {"id": 92, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "Name the U.S. war between the North and the South.", "en_a": ["The Civil War"], "ru_q": "Как называлась война между Севером и Югом США?", "ru_a": ["Гражданская война"]}, {"id": 93, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "The Civil War had many important events. Name one.", "en_a": ["(Battle of) Fort Sumter", "Emancipation Proclamation", "(Battle of) Vicksburg", "(Battle of) Gettysburg", "Sherman's March", "(Surrender at) Appomattox", "(Battle of) Antietam/Sharpsburg", "Lincoln was assassinated."], "ru_q": "У Гражданской войны было много важных событий. Назовите одно.", "ru_a": ["Форт Самтер", "Прокламация об освобождении рабов", "Битва при Виксберге", "Битва при Геттисберге", "Марш Шермана", "Капитуляция при Аппоматтоксе", "Битва при Энтитеме", "Убийство Линкольна"]}, {"id": 94, "section": "history", "subsection": "1800s", "exempt6520": true, "personalized": null, "en_q": "Abraham Lincoln is famous for many things. Name one.", "en_a": ["Freed the slaves (Emancipation Proclamation)", "Saved (or preserved) the Union", "Led the United States during the Civil War", "16th president of the United States", "Delivered the Gettysburg Address"], "ru_q": "Авраам Линкольн известен многим. Назовите одно из его достижений.", "ru_a": ["Освободил рабов (Прокламация об освобождении)", "Сохранил единство страны", "Руководил США во время Гражданской войны", "16-й президент США", "Произнёс Геттисбергскую речь"]}, {"id": 95, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "What did the Emancipation Proclamation do?", "en_a": ["Freed the slaves", "Freed slaves in the Confederacy", "Freed slaves in the Confederate states", "Freed slaves in most Southern states"], "ru_q": "Что сделала Прокламация об освобождении рабов?", "ru_a": ["Освободила рабов", "Освободила рабов в Конфедерации", "Освободила рабов в большинстве южных штатов"]}, {"id": 96, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "What U.S. war ended slavery?", "en_a": ["The Civil War"], "ru_q": "Какая война США положила конец рабству?", "ru_a": ["Гражданская война"]}, {"id": 97, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "What amendment says all persons born or naturalized in the United States, and subject to the jurisdiction thereof, are U.S. citizens?", "en_a": ["14th Amendment"], "ru_q": "Какая поправка гласит, что все родившиеся или натурализованные в США и подпадающие под её юрисдикцию являются гражданами США?", "ru_a": ["14-я поправка"]}, {"id": 98, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "When did all men get the right to vote?", "en_a": ["After the Civil War", "During Reconstruction", "(With the) 15th Amendment", "1870"], "ru_q": "Когда все мужчины получили право голоса?", "ru_a": ["После Гражданской войны", "В период Реконструкции", "15-я поправка (1870 год)"]}, {"id": 99, "section": "history", "subsection": "1800s", "exempt6520": false, "personalized": null, "en_q": "Name one leader of the women's rights movement in the 1800s.", "en_a": ["Susan B. Anthony", "Elizabeth Cady Stanton", "Sojourner Truth", "Harriet Tubman", "Lucretia Mott", "Lucy Stone"], "ru_q": "Назовите одну лидерку движения за права женщин в XIX веке.", "ru_a": ["Сьюзен Б. Энтони", "Элизабет Кэди Стэнтон", "Соджорнер Трут", "Гарриет Табмен", "Лукреция Мотт", "Люси Стоун"]}, {"id": 100, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Name one war fought by the United States in the 1900s.", "en_a": ["World War I", "World War II", "Korean War", "Vietnam War", "(Persian) Gulf War"], "ru_q": "Назовите одну войну, которую США вели в XX веке.", "ru_a": ["Первая мировая война", "Вторая мировая война", "Корейская война", "Вьетнамская война", "Война в Персидском заливе"]}, {"id": 101, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Why did the United States enter World War I?", "en_a": ["Because Germany attacked U.S. (civilian) ships", "To support the Allied Powers (England, France, Italy, and Russia)", "To oppose the Central Powers (Germany, Austria-Hungary, the Ottoman Empire, and Bulgaria)"], "ru_q": "Почему США вступили в Первую мировую войну?", "ru_a": ["Германия атаковала гражданские суда США", "Поддержка стран Антанты (Англия, Франция, Италия, Россия)", "Противодействие Центральным державам"]}, {"id": 102, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "When did all women get the right to vote?", "en_a": ["1920", "After World War I", "(With the) 19th Amendment"], "ru_q": "Когда все женщины получили право голоса?", "ru_a": ["1920 год", "После Первой мировой войны", "19-я поправка"]}, {"id": 103, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "What was the Great Depression?", "en_a": ["Longest economic recession in modern history"], "ru_q": "Что такое Великая депрессия?", "ru_a": ["Самый продолжительный экономический спад в новейшей истории США"]}, {"id": 104, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "When did the Great Depression start?", "en_a": ["The Great Crash (1929)", "Stock market crash of 1929"], "ru_q": "Когда началась Великая депрессия?", "ru_a": ["Обвал фондового рынка 1929 года"]}, {"id": 105, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Who was president during the Great Depression and World War II?", "en_a": ["(Franklin) Roosevelt"], "ru_q": "Кто был президентом во время Великой депрессии и Второй мировой войны?", "ru_a": ["Франклин Рузвельт"]}, {"id": 106, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Why did the United States enter World War II?", "en_a": ["(Bombing of) Pearl Harbor", "Japanese attacked Pearl Harbor", "To support the Allied Powers (England, France, and Russia)", "To oppose the Axis Powers (Germany, Italy, and Japan)"], "ru_q": "Почему США вступили во Вторую мировую войну?", "ru_a": ["Атака на Пёрл-Харбор", "Поддержка союзников", "Противодействие странам «Оси»"]}, {"id": 107, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Dwight Eisenhower is famous for many things. Name one.", "en_a": ["General during World War II", "President at the end of (during) the Korean War", "34th president of the United States", "Signed the Federal-Aid Highway Act of 1956 (Created the Interstate System)"], "ru_q": "Дуайт Эйзенхауэр известен многим. Назовите одно из его достижений.", "ru_a": ["Генерал во время Второй мировой войны", "Президент во время Корейской войны", "34-й президент США", "Подписал закон о строительстве федеральных автомагистралей 1956 года"]}, {"id": 108, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Who was the United States' main rival during the Cold War?", "en_a": ["Soviet Union", "USSR", "Russia"], "ru_q": "Какая страна была главным соперником США в Холодной войне?", "ru_a": ["Советский Союз (СССР)"]}, {"id": 109, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "During the Cold War, what was one main concern of the United States?", "en_a": ["Communism", "Nuclear war"], "ru_q": "Что было главной заботой США во время Холодной войны?", "ru_a": ["Коммунизм", "Ядерная война"]}, {"id": 110, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Why did the United States enter the Korean War?", "en_a": ["To stop the spread of communism"], "ru_q": "Почему США вступили в Корейскую войну?", "ru_a": ["Чтобы остановить распространение коммунизма"]}, {"id": 111, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Why did the United States enter the Vietnam War?", "en_a": ["To stop the spread of communism"], "ru_q": "Почему США вступили во Вьетнамскую войну?", "ru_a": ["Чтобы остановить распространение коммунизма"]}, {"id": 112, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "What did the civil rights movement do?", "en_a": ["Fought to end racial discrimination"], "ru_q": "Чем занималось движение за гражданские права?", "ru_a": ["Боролось за прекращение расовой дискриминации"]}, {"id": 113, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": true, "personalized": null, "en_q": "Martin Luther King, Jr. is famous for many things. Name one.", "en_a": ["Fought for civil rights", "Worked for equality for all Americans", "Worked to ensure that people would \"not be judged by the color of their skin, but by the content of their character\""], "ru_q": "Мартин Лютер Кинг мл. известен многим. Назовите одно из его достижений.", "ru_a": ["Боролся за гражданские права", "Добивался равенства для всех американцев", "Призывал судить людей «не по цвету кожи, а по их характеру»"]}, {"id": 114, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Why did the United States enter the Persian Gulf War?", "en_a": ["To force the Iraqi military from Kuwait"], "ru_q": "Почему США вступили в войну в Персидском заливе?", "ru_a": ["Чтобы вытеснить иракские войска из Кувейта"]}, {"id": 115, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": true, "personalized": null, "en_q": "What major event happened on September 11, 2001, in the United States?", "en_a": ["Terrorists attacked the United States", "Terrorists took over two planes and crashed them into the World Trade Center in New York City", "Terrorists took over a plane and crashed into the Pentagon in Arlington, Virginia", "Terrorists took over a plane originally aimed at Washington, D.C., and crashed in a field in Pennsylvania"], "ru_q": "Какое крупное событие произошло в США 11 сентября 2001 года?", "ru_a": ["Террористы атаковали США", "Захватили два самолёта и направили их во Всемирный торговый центр в Нью-Йорке", "Захватили самолёт и направили его в Пентагон в Арлингтоне, штат Виргиния", "Захватили самолёт, летевший в Вашингтон, который разбился в поле в Пенсильвании"]}, {"id": 116, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Name one U.S. military conflict after the September 11, 2001 attacks.", "en_a": ["(Global) War on Terror", "War in Afghanistan", "War in Iraq"], "ru_q": "Назовите один военный конфликт США после терактов 11 сентября 2001 года.", "ru_a": ["«Война с террором»", "Война в Афганистане", "Война в Ираке"]}, {"id": 117, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Name one American Indian tribe in the United States.", "en_a": ["Apache", "Blackfeet", "Cayuga", "Cherokee", "Cheyenne", "Chippewa", "Choctaw", "Creek", "Crow", "Hopi", "Huron", "Inupiat", "Lakota", "Mohawk", "Mohegan", "Navajo", "Oneida", "Onondaga", "Pueblo", "Seminole", "Seneca", "Shawnee", "Sioux", "Teton", "Tuscarora"], "ru_q": "Назовите одно племя американских индейцев.", "ru_a": ["Апачи", "Черноногие", "Кайюга", "Чероки", "Шайенны", "Чиппева", "Чокто", "Крик", "Кроу", "Хопи", "Гуроны", "Инупиаты", "Лакота", "Могавки", "Могеганы", "Навахо", "Онейда", "Онондага", "Пуэбло", "Семинолы", "Сенека", "Шауни", "Сиу", "Тетон", "Тускарора"]}, {"id": 118, "section": "history", "subsection": "Recent American History and Other Important Historical Information", "exempt6520": false, "personalized": null, "en_q": "Name one example of an American innovation.", "en_a": ["Light bulb", "Automobile (cars, internal combustion engine)", "Skyscrapers", "Airplane", "Assembly line", "Landing on the moon", "Integrated circuit (IC)"], "ru_q": "Назовите одно американское изобретение.", "ru_a": ["Лампочка", "Автомобиль (двигатель внутреннего сгорания)", "Небоскрёбы", "Самолёт", "Конвейер", "Высадка на Луну", "Интегральная схема"]}, {"id": 119, "section": "symbols", "subsection": "Symbols", "exempt6520": false, "personalized": null, "en_q": "What is the capital of the United States?", "en_a": ["Washington, D.C."], "ru_q": "Какая столица США?", "ru_a": ["Вашингтон, округ Колумбия"]}, {"id": 120, "section": "symbols", "subsection": "Symbols", "exempt6520": false, "personalized": null, "en_q": "Where is the Statue of Liberty?", "en_a": ["New York (Harbor)", "Liberty Island", "(Also acceptable: New Jersey, near New York City, on the Hudson River.)"], "ru_q": "Где находится Статуя Свободы?", "ru_a": ["Нью-Йоркская гавань", "Остров Свободы", "Также верно: Нью-Джерси, рядом с Нью-Йорком, на реке Гудзон"]}, {"id": 121, "section": "symbols", "subsection": "Symbols", "exempt6520": true, "personalized": null, "en_q": "Why does the flag have 13 stripes?", "en_a": ["(Because there were) 13 original colonies", "(Because the stripes) represent the original colonies"], "ru_q": "Почему на флаге 13 полос?", "ru_a": ["Потому что изначально было 13 колоний", "Полосы символизируют первые колонии"]}, {"id": 122, "section": "symbols", "subsection": "Symbols", "exempt6520": false, "personalized": null, "en_q": "Why does the flag have 50 stars?", "en_a": ["(Because there is) one star for each state", "(Because) each star represents a state", "(Because there are) 50 states"], "ru_q": "Почему на флаге 50 звёзд?", "ru_a": ["По одной звезде на каждый штат", "Каждая звезда символизирует штат", "В США 50 штатов"]}, {"id": 123, "section": "symbols", "subsection": "Symbols", "exempt6520": false, "personalized": null, "en_q": "What is the name of the national anthem?", "en_a": ["The Star-Spangled Banner"], "ru_q": "Как называется государственный гимн США?", "ru_a": ["«Знамя, усыпанное звёздами» (The Star-Spangled Banner)"]}, {"id": 124, "section": "symbols", "subsection": "Symbols", "exempt6520": false, "personalized": null, "en_q": "The Nation's first motto was \"E Pluribus Unum.\" What does that mean?", "en_a": ["Out of many, one", "We all become one"], "ru_q": "Первый девиз страны — «E Pluribus Unum». Что это значит?", "ru_a": ["«Из многих — единое»"]}, {"id": 125, "section": "symbols", "subsection": "Holidays", "exempt6520": false, "personalized": null, "en_q": "What is Independence Day?", "en_a": ["A holiday to celebrate U.S. independence (from Britain)", "The country's birthday"], "ru_q": "Что такое День независимости?", "ru_a": ["Праздник в честь независимости США от Британии", "«День рождения» страны"]}, {"id": 126, "section": "symbols", "subsection": "Holidays", "exempt6520": true, "personalized": null, "en_q": "Name three national U.S. holidays.", "en_a": ["New Year's Day", "Martin Luther King, Jr. Day", "Presidents Day (Washington's Birthday)", "Memorial Day", "Juneteenth", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving Day", "Christmas Day"], "ru_q": "Назовите три национальных праздника США.", "ru_a": ["Новый год", "День Мартина Лютера Кинга", "День президентов (день рождения Вашингтона)", "День поминовения", "Juneteenth (День освобождения)", "День независимости", "День труда", "День Колумба", "День ветеранов", "День благодарения", "Рождество"]}, {"id": 127, "section": "symbols", "subsection": "Holidays", "exempt6520": false, "personalized": null, "en_q": "What is Memorial Day?", "en_a": ["A holiday to honor soldiers who died in military service"], "ru_q": "Что такое День поминовения?", "ru_a": ["Праздник в память о военных, погибших на службе"]}, {"id": 128, "section": "symbols", "subsection": "Holidays", "exempt6520": false, "personalized": null, "en_q": "What is Veterans Day?", "en_a": ["A holiday to honor people in the (U.S.) military", "A holiday to honor people who have served (in the U.S. military)"], "ru_q": "Что такое День ветеранов?", "ru_a": ["Праздник в честь всех, кто служил в вооружённых силах"]}];
+const STATES = [{"name": "Alabama", "capital": "Montgomery"}, {"name": "Alaska", "capital": "Juneau"}, {"name": "Arizona", "capital": "Phoenix"}, {"name": "Arkansas", "capital": "Little Rock"}, {"name": "California", "capital": "Sacramento"}, {"name": "Colorado", "capital": "Denver"}, {"name": "Connecticut", "capital": "Hartford"}, {"name": "Delaware", "capital": "Dover"}, {"name": "District of Columbia", "capital": "(no capital — D.C. is the capital)"}, {"name": "Florida", "capital": "Tallahassee"}, {"name": "Georgia", "capital": "Atlanta"}, {"name": "Hawaii", "capital": "Honolulu"}, {"name": "Idaho", "capital": "Boise"}, {"name": "Illinois", "capital": "Springfield"}, {"name": "Indiana", "capital": "Indianapolis"}, {"name": "Iowa", "capital": "Des Moines"}, {"name": "Kansas", "capital": "Topeka"}, {"name": "Kentucky", "capital": "Frankfort"}, {"name": "Louisiana", "capital": "Baton Rouge"}, {"name": "Maine", "capital": "Augusta"}, {"name": "Maryland", "capital": "Annapolis"}, {"name": "Massachusetts", "capital": "Boston"}, {"name": "Michigan", "capital": "Lansing"}, {"name": "Minnesota", "capital": "Saint Paul"}, {"name": "Mississippi", "capital": "Jackson"}, {"name": "Missouri", "capital": "Jefferson City"}, {"name": "Montana", "capital": "Helena"}, {"name": "Nebraska", "capital": "Lincoln"}, {"name": "Nevada", "capital": "Carson City"}, {"name": "New Hampshire", "capital": "Concord"}, {"name": "New Jersey", "capital": "Trenton"}, {"name": "New Mexico", "capital": "Santa Fe"}, {"name": "New York", "capital": "Albany"}, {"name": "North Carolina", "capital": "Raleigh"}, {"name": "North Dakota", "capital": "Bismarck"}, {"name": "Ohio", "capital": "Columbus"}, {"name": "Oklahoma", "capital": "Oklahoma City"}, {"name": "Oregon", "capital": "Salem"}, {"name": "Pennsylvania", "capital": "Harrisburg"}, {"name": "Rhode Island", "capital": "Providence"}, {"name": "South Carolina", "capital": "Columbia"}, {"name": "South Dakota", "capital": "Pierre"}, {"name": "Tennessee", "capital": "Nashville"}, {"name": "Texas", "capital": "Austin"}, {"name": "Utah", "capital": "Salt Lake City"}, {"name": "Vermont", "capital": "Montpelier"}, {"name": "Virginia", "capital": "Richmond"}, {"name": "Washington", "capital": "Olympia"}, {"name": "West Virginia", "capital": "Charleston"}, {"name": "Wisconsin", "capital": "Madison"}, {"name": "Wyoming", "capital": "Cheyenne"}];
+
+/* ---------- STATE (in-memory only, no localStorage) ---------- */
+const state = {
+  lang: 'both', // 'en' | 'both'
+  tab: 'dashboard',
+  screen: null, // sub-screen override, e.g. 'flash-session'
+  progress: {}, // id -> {seen, correct, wrong, lastResult, history:[{date,result}]}
+  personalization: {
+    stateName: '', capital: '', senator1:'', senator2:'', representative:'', governor:'',
+    president:'Donald Trump', vicepresident:'JD Vance', speaker:'Mike Johnson', chiefjustice:'John Roberts'
+  },
+  session: null, // active flashcard/quiz/mock session data
+  streak: 0,
+  lastActiveDate: null,
+};
+
+function ensureProgress(id){
+  if(!state.progress[id]) state.progress[id] = {seen:0, correct:0, wrong:0, lastResult:null, history:[]};
+  return state.progress[id];
+}
+
+function recordResult(id, ok){
+  const p = ensureProgress(id);
+  p.seen++;
+  if(ok){ p.correct++; } else { p.wrong++; }
+  p.lastResult = ok ? 'good' : 'bad';
+  p.history.push({t: Date.now(), ok});
+  if(p.history.length>20) p.history.shift();
+  touchStreak();
+}
+
+function touchStreak(){
+  const today = new Date().toDateString();
+  if(state.lastActiveDate !== today){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    state.streak = (state.lastActiveDate === y.toDateString()) ? state.streak+1 : 1;
+    state.lastActiveDate = today;
+  }
+}
+
+function masteryOf(id){
+  const p = state.progress[id];
+  if(!p || p.seen===0) return 'new';
+  if(p.lastResult==='good' && p.correct >= p.wrong+1) return 'good';
+  if(p.lastResult==='bad') return 'bad';
+  return 'warn';
+}
+
+function overallStats(){
+  let mastered=0, learning=0, unseen=0;
+  QUESTIONS.forEach(q=>{
+    const m = masteryOf(q.id);
+    if(m==='new') unseen++;
+    else if(m==='good') mastered++;
+    else learning++;
+  });
+  return {mastered, learning, unseen, total: QUESTIONS.length};
+}
+
+function categoryStats(){
+  const cats = {};
+  QUESTIONS.forEach(q=>{
+    cats[q.subsection] = cats[q.subsection] || {total:0, mastered:0};
+    cats[q.subsection].total++;
+    if(masteryOf(q.id)==='good') cats[q.subsection].mastered++;
+  });
+  return cats;
+}
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent = msg;
+  document.getElementById('toast-holder').appendChild(el);
+  setTimeout(()=>el.remove(), 2200);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) { toast('Озвучка не поддерживается в этом браузере'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.92;
+  window.speechSynthesis.speak(u);
+}
+
+/* ---------- voice answer (speech recognition) ---------- */
+function hasSpeechRecognition(){
+  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+const STOPWORDS = new Set(['the','a','an','of','to','in','is','are','and','or','for','by','at','on','with','as','that','this','it','its','their','they','we','us','people','you','your']);
+function normalizeForMatch(s){
+  return String(s).toLowerCase()
+    .replace(/[().,!?;:"']/g,' ')
+    .replace(/-/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function keywordsOf(s){
+  return normalizeForMatch(s).split(' ').filter(w => w.length && (w.length>2 || /^\d+$/.test(w)) && !STOPWORDS.has(w));
+}
+function answerVariants(answerText){
+  const parens = [...String(answerText).matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
+  const stripped = String(answerText).replace(/\([^)]*\)/g,' ');
+  return [answerText, stripped, ...parens];
+}
+function matchScore(transcript, answer){
+  const tWords = new Set(normalizeForMatch(transcript).split(' ').filter(Boolean));
+  let best = 0;
+  answerVariants(answer).forEach(variant=>{
+    const kws = keywordsOf(variant);
+    if(kws.length===0) return;
+    let hit=0;
+    kws.forEach(k=>{ if(tWords.has(k)) hit++; });
+    const sc = hit/kws.length;
+    if(sc>best) best=sc;
+  });
+  return best;
+}
+function bestMatch(transcript, answers){
+  let best=0;
+  answers.forEach(a=>{ const sc = matchScore(transcript,a); if(sc>best) best=sc; });
+  return best;
+}
+function speechErrorText(code){
+  const map = {
+    'not-allowed':'Доступ к микрофону не разрешён — проверьте настройки браузера.',
+    'permission-denied':'Доступ к микрофону не разрешён.',
+    'no-speech':'Речь не распознана, попробуйте ещё раз.',
+    'audio-capture':'Не найден микрофон.',
+    'network':'Для распознавания речи нужен интернет.'
+  };
+  return map[code] || 'Не удалось распознать речь.';
+}
+function startListening(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast('Голосовой ввод не поддерживается в этом браузере'); return; }
+  const sess = state.session;
+  if(!sess) return;
+  const rec = new SR();
+  rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+  sess.listening = true; render();
+  rec.onresult = (e)=>{
+    const transcript = e.results[0][0].transcript;
+    const q = QUESTIONS.find(x=>x.id===sess.list[sess.idx]);
+    sess.heard = transcript;
+    sess.heardScore = bestMatch(transcript, q.en_a);
+    sess.listening = false;
+    sess.flipped = true;
+    render();
+  };
+  rec.onerror = (e)=>{
+    sess.listening = false;
+    toast(speechErrorText(e.error));
+    render();
+  };
+  rec.onend = ()=>{ if(sess.listening){ sess.listening=false; render(); } };
+  try{ rec.start(); }catch(e){ sess.listening=false; toast('Не удалось запустить распознавание речи'); render(); }
+}
+function personalizedAnswer(q){
+  const p = state.personalization;
+  if(q.personalized==='senator') return [p.senator1 || '—', p.senator2 || ''].filter(Boolean).join(', ') || null;
+  if(q.personalized==='representative') return p.representative || null;
+  if(q.personalized==='governor') return p.governor || null;
+  if(q.personalized==='capital') return p.capital || null;
+  if(q.personalized==='current'){
+    if(q.id===30) return p.speaker || null;
+    if(q.id===38) return p.president || null;
+    if(q.id===39) return p.vicepresident || null;
+    if(q.id===57) return p.chiefjustice || null;
+  }
+  return null;
+}
+
+function pickRandom(arr, n){
+  const copy = arr.slice();
+  for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; }
+  return copy.slice(0,n);
+}
+
+/* ---------- RENDER ROOT ---------- */
+function render(){
+  document.querySelectorAll('.tabbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===state.tab && !state.screen);
+  });
+  const app = document.getElementById('app');
+  if(state.screen){
+    app.innerHTML = renderScreen();
+  } else if(state.tab==='dashboard'){
+    app.innerHTML = renderDashboard();
+  } else if(state.tab==='flashcards'){
+    app.innerHTML = renderFlashcardsHome();
+  } else if(state.tab==='quiz'){
+    app.innerHTML = renderQuizHome();
+  } else if(state.tab==='mock'){
+    app.innerHTML = renderMockHome();
+  } else if(state.tab==='settings'){
+    app.innerHTML = renderSettings();
+  }
+  wireEvents();
+}
+
+function renderScreen(){
+  if(state.screen==='flash-session') return renderFlashSession();
+  if(state.screen==='quiz-session') return renderQuizSession();
+  if(state.screen==='quiz-result') return renderQuizResult();
+  if(state.screen==='mock-session') return renderMockSession();
+  if(state.screen==='mock-result') return renderMockResult();
+  return '';
+}
+
+/* ---------- HEADER ---------- */
+function headerHtml(title){
+  return `<header class="top">
+    <h1>${title}</h1>
+    <div class="lang-toggle">
+      <button data-lang="en" class="${state.lang==='en'?'active':''}">EN</button>
+      <button data-lang="both" class="${state.lang==='both'?'active':''}">EN+RU</button>
+    </div>
+  </header>`;
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const s = overallStats();
+  const pct = Math.round((s.mastered/s.total)*100);
+  const r = 34, c = 2*Math.PI*r;
+  const dash = c*pct/100;
+  return `
+  ${headerHtml('CivicsCoach 🇺🇸')}
+  <div class="card ring-wrap">
+    <svg class="ring" viewBox="0 0 84 84">
+      <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="9"/>
+      <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--primary)" stroke-width="9"
+        stroke-dasharray="${dash} ${c}" stroke-linecap="round" transform="rotate(-90 42 42)"/>
+      <text x="42" y="47" text-anchor="middle" font-size="16" font-weight="800" fill="var(--text)">${pct}%</text>
+    </svg>
+    <div class="ring-label">Выучено вопросов<b>${s.mastered} из ${s.total}</b>🔥 ${state.streak} ${streakWord(state.streak)} подряд</div>
+  </div>
+  <div class="dash-grid">
+    <div class="stat"><div class="num">${s.mastered}</div><div class="lbl">Освоено</div></div>
+    <div class="stat"><div class="num">${s.learning}</div><div class="lbl">В процессе</div></div>
+    <div class="stat"><div class="num">${s.unseen}</div><div class="lbl">Не начато</div></div>
+    <div class="stat"><div class="num">${countWrongPriority()}</div><div class="lbl">Требуют повтора</div></div>
+  </div>
+  <div class="menu">
+    <button class="tile" data-action="start-learn"><div class="emoji">✨</div><div class="t">Изучать новые</div><div class="d">Порции по 10 вопросов</div></button>
+    <button class="tile" data-action="start-review"><div class="emoji">🔁</div><div class="t">Повторить ошибки</div><div class="d">${countWrongPriority()} вопросов</div></button>
+    <button class="tile" data-action="start-mock"><div class="emoji">🎤</div><div class="t">Симуляция интервью</div><div class="d">Как на настоящем экзамене</div></button>
+    <button class="tile" data-action="start-quiz-all"><div class="emoji">✅</div><div class="t">Тренировочный квиз</div><div class="d">Выбор ответа, авто-проверка</div></button>
+  </div>
+  <h3 class="sect">Прогресс по разделам</h3>
+  <div class="card">${categoryBarsHtml()}</div>
+  <h3 class="sect">Данные</h3>
+  <div class="card">
+    <p class="lead" style="margin-bottom:12px;">Прогресс хранится только в этой сессии браузера. Сохраните файл прогресса, чтобы продолжить в другой раз.</p>
+    <div class="row">
+      <button class="btn secondary" data-action="export">⬇️ Сохранить прогресс</button>
+      <label class="btn secondary" style="cursor:pointer;">⬆️ Загрузить прогресс<input type="file" id="import-file" accept="application/json" style="display:none;"></label>
+    </div>
+  </div>`;
+}
+function streakWord(n){
+  const n10=n%10, n100=n%100;
+  if(n100>=11&&n100<=14) return 'дней';
+  if(n10===1) return 'день';
+  if(n10>=2&&n10<=4) return 'дня';
+  return 'дней';
+}
+function countWrongPriority(){
+  return QUESTIONS.filter(q=>masteryOf(q.id)==='bad' || masteryOf(q.id)==='warn').length;
+}
+function categoryBarsHtml(){
+  const cats = categoryStats();
+  return Object.entries(cats).map(([name,c])=>{
+    const pct = Math.round((c.mastered/c.total)*100);
+    return `<div style="margin-bottom:12px;">
+      <div class="catbar"><span class="name">${esc(name)}</span><span class="pct">${c.mastered}/${c.total}</span></div>
+      <div class="progressbar"><div style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- FLASHCARDS HOME ---------- */
+function renderFlashcardsHome(){
+  const cats = [...new Set(QUESTIONS.map(q=>q.subsection))];
+  return `${headerHtml('Карточки')}
+  <p class="lead">Выберите раздел или пройдите все 128 вопросов подряд.</p>
+  <div class="card">
+    <button class="btn" style="width:100%;margin-bottom:10px;" data-action="flash-all">Все 128 вопросов</button>
+    <button class="btn secondary" style="width:100%;" data-action="flash-new">Только новые</button>
+  </div>
+  <h3 class="sect">По разделам</h3>
+  ${cats.map(c=>{
+    const items = QUESTIONS.filter(q=>q.subsection===c);
+    const mastered = items.filter(q=>masteryOf(q.id)==='good').length;
+    return `<div class="card" style="cursor:pointer;" data-action="flash-cat" data-cat="${esc(c)}">
+      <div class="catbar"><span class="name">${esc(c)}</span><span class="pct">${mastered}/${items.length}</span></div>
+      <div class="progressbar"><div style="width:${Math.round(mastered/items.length*100)}%"></div></div>
+    </div>`;
+  }).join('')}`;
+}
+
+function startFlashSession(list, mode){
+  if(list.length===0){ toast('Нет вопросов в этой подборке'); return; }
+  state.session = { list: list.map(q=>q.id), idx:0, flipped:false, mode };
+  state.screen='flash-session';
+  render();
+}
+
+function renderFlashSession(){
+  const sess = state.session;
+  if(!sess || sess.idx>=sess.list.length){
+    return `<div class="backbar"><button data-action="back-home">← Назад</button></div>
+      <div class="empty"><div class="big">🎉</div><p>Карточки закончились на этой сессии.</p>
+      <button class="btn" data-action="back-home">Готово</button></div>`;
+  }
+  const q = QUESTIONS.find(x=>x.id===sess.list[sess.idx]);
+  const pAns = personalizedAnswer(q);
+  const pct = Math.round((sess.idx/sess.list.length)*100);
+  return `<div class="backbar"><button data-action="back-home">← Выйти</button><h2>Карточка ${sess.idx+1} / ${sess.list.length}</h2></div>
+  <div class="progressbar" style="margin-bottom:14px;"><div style="width:${pct}%"></div></div>
+  <div class="card flash" data-action="flip">
+    <div>
+      <div class="qnum">Вопрос #${q.id} · ${esc(q.subsection)} ${q.exempt6520?'· <span class="badge new">65/20 ★</span>':''}</div>
+      <div class="qtext">${esc(q.en_q)} <button class="speak-btn" data-action="speak" data-text="${esc(q.en_q)}">🔊</button></div>
+      ${state.lang==='both' ? `<div class="qtext-ru">${esc(q.ru_q)}</div>` : ''}
+    </div>
+    ${sess.flipped ? `
+      <div class="ans">
+        <b>Ответ${q.en_a.length>1?' (варианты)':''}:</b>
+        <ul>${q.en_a.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+        ${pAns ? `<div class="badge good" style="margin-top:6px;">Ваш вариант: ${esc(pAns)}</div>` : (q.personalized?`<div class="badge warn" style="margin-top:6px;">Заполните в Настройках → Персонализация</div>`:'')}
+        ${state.lang==='both' ? `<div class="ans-ru" style="margin-top:8px;">${q.ru_a.map(esc).join(' / ')}</div>` : ''}
+      </div>` : `<div class="hint">Нажмите на карточку, чтобы увидеть ответ</div>`}
+  </div>
+  ${sess.flipped ? `
+    <div class="row">
+      <button class="btn bad" style="flex:1;" data-action="flash-grade" data-ok="0">Не знал(а)</button>
+      <button class="btn good" style="flex:1;" data-action="flash-grade" data-ok="1">Знал(а)</button>
+    </div>` : ''}
+  `;
+}
+
+/* ---------- QUIZ (multiple choice, auto-graded) ---------- */
+function renderQuizHome(){
+  return `${headerHtml('Тренировочный квиз')}
+  <p class="lead">Вопрос с выбором ответа — проверяется автоматически. Хороший способ проверить себя без напарника.</p>
+  <div class="card">
+    <label class="field">Количество вопросов</label>
+    <select id="quiz-count"><option>10</option><option selected>20</option><option>40</option><option value="${QUESTIONS.length}">Все ${QUESTIONS.length}</option></select>
+    <label class="field">Раздел</label>
+    <select id="quiz-cat"><option value="">Все разделы</option>${[...new Set(QUESTIONS.map(q=>q.subsection))].map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+    <div style="margin-top:16px;">
+      <button class="btn" style="width:100%;" data-action="quiz-start">Начать квиз</button>
+    </div>
+  </div>
+  <div class="card">
+    <button class="btn secondary" style="width:100%;" data-action="quiz-weak">Квиз по вопросам, где я чаще ошибаюсь (${countWrongPriority()})</button>
+  </div>`;
+}
+
+function buildQuizOptions(q){
+  const correct = q.en_a[0];
+  const seen = new Set([correct]);
+  const distractors = [];
+  const sectionPool = pickRandom(QUESTIONS.filter(o=>o.id!==q.id && o.section===q.section), 40);
+  for(const o of sectionPool){
+    if(distractors.length>=3) break;
+    if(!seen.has(o.en_a[0])){ distractors.push(o.en_a[0]); seen.add(o.en_a[0]); }
+  }
+  if(distractors.length<3){
+    const anyPool = pickRandom(QUESTIONS.filter(o=>o.id!==q.id), 60);
+    for(const o of anyPool){
+      if(distractors.length>=3) break;
+      if(!seen.has(o.en_a[0])){ distractors.push(o.en_a[0]); seen.add(o.en_a[0]); }
+    }
+  }
+  return pickRandom([correct, ...distractors], 1+distractors.length);
+}
+
+function startQuiz(list){
+  if(list.length===0){ toast('Нет вопросов для этого выбора'); return; }
+  state.session = { list: list.map(q=>({id:q.id, opts: buildQuizOptions(q), answered:false})), idx:0, correct:0 };
+  state.screen='quiz-session';
+  render();
+}
+
+function renderQuizSession(){
+  const sess = state.session;
+  if(!sess || sess.idx>=sess.list.length){ state.screen='quiz-result'; return renderQuizResult(); }
+  const cur = sess.list[sess.idx];
+  const q = QUESTIONS.find(x=>x.id===cur.id);
+  const pct = Math.round((sess.idx/sess.list.length)*100);
+  return `<div class="backbar"><button data-action="back-home">← Выйти</button><h2>Квиз ${sess.idx+1}/${sess.list.length}</h2></div>
+  <div class="progressbar" style="margin-bottom:14px;"><div style="width:${pct}%"></div></div>
+  <div class="card">
+    <div class="qnum">Вопрос #${q.id}</div>
+    <div class="qtext">${esc(q.en_q)}</div>
+    ${state.lang==='both' ? `<div class="qtext-ru" style="margin-bottom:12px;">${esc(q.ru_q)}</div>` : '<div style="margin-bottom:8px;"></div>'}
+    ${cur.opts.map((o,i)=>`<button class="quiz-opt ${cur.answered ? (o===q.en_a[0] ? 'correct' : (cur.picked===o?'wrong':'')) : ''}" data-action="quiz-answer" data-i="${i}" ${cur.answered?'disabled':''}>${esc(o)}</button>`).join('')}
+    ${cur.answered ? `<button class="btn" style="width:100%;margin-top:8px;" data-action="quiz-next">Далее →</button>` : ''}
+  </div>`;
+}
+
+function renderQuizResult(){
+  const sess = state.session;
+  const pct = Math.round(sess.correct/sess.list.length*100);
+  return `<div class="backbar"><button data-action="back-home">← Готово</button><h2>Результат</h2></div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:40px;font-weight:800;color:var(--primary);">${sess.correct}/${sess.list.length}</div>
+    <div class="lead">${pct}% правильных ответов</div>
+  </div>
+  <button class="btn" style="width:100%;" data-action="back-home">На главную</button>`;
+}
+
+/* ---------- MOCK INTERVIEW (real test simulation) ---------- */
+function renderMockHome(){
+  return `${headerHtml('Симуляция интервью')}
+  <p class="lead">Точно как на настоящем экзамене: вопросы задаются по одному в случайном порядке. Проверка останавливается, как только вы наберёте <b>12 верных</b> (сдано) или <b>9 неверных</b> (не сдано). Отвечайте вслух и сами оценивайте, знали ли ответ — как оценивает офицер USCIS.</p>
+  <div class="card">
+    <button class="btn" style="width:100%;" data-action="mock-start">Начать симуляцию</button>
+  </div>`;
+}
+
+function renderMockSession(){
+  const sess = state.session;
+  if(sess.correct>=12 || sess.wrong>=9 || sess.idx>=sess.list.length){
+    state.screen='mock-result';
+    return renderMockResult();
+  }
+  const q = QUESTIONS.find(x=>x.id===sess.list[sess.idx]);
+  const pAns = personalizedAnswer(q);
+  const canListen = hasSpeechRecognition();
+  return `<div class="backbar"><button data-action="back-home">← Прервать</button><h2>Интервью</h2></div>
+  <div class="row" style="margin-bottom:12px;">
+    <div class="badge good">Верно: ${sess.correct}/12</div>
+    <div class="badge bad">Неверно: ${sess.wrong}/9</div>
+  </div>
+  <div class="card flash" data-action="flip">
+    <div>
+      <div class="qnum">Вопрос ${sess.idx+1} · #${q.id}</div>
+      <div class="qtext">${esc(q.en_q)} <button class="speak-btn" data-action="speak" data-text="${esc(q.en_q)}">🔊</button></div>
+    </div>
+    ${sess.flipped ? `
+      <div class="ans">
+        ${sess.heard ? `<div style="margin-bottom:10px;">
+            <div class="field-hint">Вы сказали:</div>
+            <div style="font-style:italic;">"${esc(sess.heard)}"</div>
+            <span class="badge ${sess.heardScore>=0.6?'good':'warn'}" style="margin-top:6px;">${sess.heardScore>=0.6 ? 'Похоже на верный ответ' : 'Не уверен(а) — сверьте сами'}</span>
+          </div>` : ''}
+        <ul>${q.en_a.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+        ${pAns ? `<div class="badge good" style="margin-top:6px;">Ваш вариант: ${esc(pAns)}</div>` : ''}
+      </div>` : `
+      <div class="hint">${sess.listening ? '🎙 Слушаю… говорите ответ по-английски' : 'Ответьте вслух, затем нажмите карточку, чтобы увидеть правильный ответ'}</div>
+      <div style="text-align:center;margin-top:12px;">
+        ${canListen
+          ? `<button class="btn secondary" data-action="mock-listen" ${sess.listening?'disabled':''}>${sess.listening ? '🎙 Слушаю…' : '🎙 Ответить голосом'}</button>`
+          : `<div class="field-hint">Голосовой ответ поддерживается в Chrome/Edge (компьютер и Android)</div>`}
+      </div>`}
+  </div>
+  ${sess.flipped ? `
+    <div class="row">
+      <button class="btn bad" style="flex:1;" data-action="mock-grade" data-ok="0">Ответил(а) неверно</button>
+      <button class="btn good" style="flex:1;" data-action="mock-grade" data-ok="1">Ответил(а) верно</button>
+    </div>` : ''}`;
+}
+
+function renderMockResult(){
+  const sess = state.session;
+  const passed = sess.correct>=12;
+  return `<div class="backbar"><button data-action="back-home">← Готово</button><h2>Итог</h2></div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:40px;">${passed?'✅':'❌'}</div>
+    <div style="font-size:20px;font-weight:800;margin-top:6px;">${passed?'Тест пройден':'Тест не пройден'}</div>
+    <div class="lead">Верно: ${sess.correct} · Неверно: ${sess.wrong} из ${sess.idx} заданных</div>
+  </div>
+  <button class="btn" style="width:100%;" data-action="back-home">На главную</button>`;
+}
+
+/* ---------- SETTINGS / PERSONALIZATION ---------- */
+function renderSettings(){
+  const p = state.personalization;
+  return `${headerHtml('Настройки')}
+  <div class="card">
+    <h3 class="sect" style="margin-top:0;">Персонализация (вопросы 23, 29, 30, 38, 39, 57, 61, 62)</h3>
+    <p class="lead">Часть вопросов civics-теста зависит от того, где вы живёте, и от текущих должностных лиц. Заполните один раз — ответы подставятся в карточки автоматически.</p>
+    <label class="field">Ваш штат</label>
+    <select id="p-state"><option value="">— выберите —</option>${STATES.map(s=>`<option value="${esc(s.name)}" ${p.stateName===s.name?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
+    <div class="field-hint" id="capital-hint"></div>
+    <label class="field">Сенатор №1 (штата)</label>
+    <input type="text" id="p-sen1" value="${esc(p.senator1)}" placeholder="Например: Alex Padilla">
+    <label class="field">Сенатор №2 (штата)</label>
+    <input type="text" id="p-sen2" value="${esc(p.senator2)}" placeholder="Например: Adam Schiff">
+    <label class="field">Ваш представитель в Конгрессе (House)</label>
+    <input type="text" id="p-rep" value="${esc(p.representative)}" placeholder="Имя вашего представителя">
+    <label class="field">Губернатор штата</label>
+    <input type="text" id="p-gov" value="${esc(p.governor)}" placeholder="Имя губернатора">
+    <div class="divider"></div>
+    <p class="field-hint">Эти четыре меняются редко, но проверьте актуальность ближе к дате интервью на <a href="https://www.uscis.gov/citizenship/testupdates" target="_blank" rel="noopener">uscis.gov/citizenship/testupdates</a>.</p>
+    <label class="field">Президент США</label>
+    <input type="text" id="p-president" value="${esc(p.president)}">
+    <label class="field">Вице-президент США</label>
+    <input type="text" id="p-vp" value="${esc(p.vicepresident)}">
+    <label class="field">Спикер Палаты представителей</label>
+    <input type="text" id="p-speaker" value="${esc(p.speaker)}">
+    <label class="field">Председатель Верховного суда</label>
+    <input type="text" id="p-cj" value="${esc(p.chiefjustice)}">
+    <button class="btn" style="width:100%;margin-top:16px;" data-action="save-personalization">Сохранить</button>
+  </div>
+  <div class="card">
+    <h3 class="sect" style="margin-top:0;">Данные и прогресс</h3>
+    <p class="lead">Прогресс живёт только в этой вкладке браузера. Скачайте файл, чтобы не потерять его, и загрузите в следующий раз, когда откроете приложение.</p>
+    <div class="row">
+      <button class="btn secondary" data-action="export">⬇️ Сохранить прогресс</button>
+      <label class="btn secondary" style="cursor:pointer;">⬆️ Загрузить прогресс<input type="file" id="import-file-2" accept="application/json" style="display:none;"></label>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn bad" data-action="reset-progress">Сбросить весь прогресс</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="sect" style="margin-top:0;">О приложении</h3>
+    <p class="lead">128 вопросов версии 2025 civics-теста (M-1778, 09/25), официальный список USCIS. На интервью офицер задаёт до 20 вопросов и останавливается на 12 верных или 9 неверных ответах. Это неофициальный учебный инструмент, не связанный с USCIS.</p>
+  </div>`;
+}
+
+/* ---------- EVENTS ---------- */
+function wireEvents(){
+  document.querySelectorAll('.tabbtn').forEach(b=>{
+    b.onclick = ()=>{ state.tab=b.dataset.tab; state.screen=null; state.session=null; render(); };
+  });
+  document.querySelectorAll('[data-lang]').forEach(b=>{
+    b.onclick = ()=>{ state.lang=b.dataset.lang; render(); };
+  });
+  const app = document.getElementById('app');
+
+  app.querySelectorAll('[data-action]').forEach(el=>{
+    const action = el.dataset.action;
+    el.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      handleAction(action, el, ev);
+    });
+  });
+  const impFile = document.getElementById('import-file') || document.getElementById('import-file-2');
+  if(impFile) impFile.addEventListener('change', handleImport);
+
+  const pState = document.getElementById('p-state');
+  if(pState){
+    updateCapitalHint();
+    pState.addEventListener('change', updateCapitalHint);
+  }
+}
+function updateCapitalHint(){
+  const sel = document.getElementById('p-state');
+  const hint = document.getElementById('capital-hint');
+  if(!sel||!hint) return;
+  const s = STATES.find(x=>x.name===sel.value);
+  hint.textContent = s ? `Столица штата: ${s.capital}` : '';
+}
+
+function handleAction(action, el){
+  if(action==='flip'){ if(state.session){ state.session.flipped = !state.session.flipped; render(); } return; }
+  if(action==='speak'){ speak(el.dataset.text); return; }
+  if(action==='back-home'){ state.screen=null; state.session=null; render(); return; }
+
+  if(action==='start-learn'){
+    const unseen = QUESTIONS.filter(q=>!(state.progress[q.id]&&state.progress[q.id].seen>0));
+    startFlashSession(pickRandom(unseen, Math.min(10, unseen.length)).sort((a,b)=>a.id-b.id), 'learn');
+    return;
+  }
+  if(action==='start-review'){
+    const weak = QUESTIONS.filter(q=>['bad','warn'].includes(masteryOf(q.id)));
+    startFlashSession(weak, 'review');
+    return;
+  }
+  if(action==='start-mock' || action==='mock-start'){
+    state.session = { list: pickRandom(QUESTIONS, QUESTIONS.length).map(q=>q.id), idx:0, correct:0, wrong:0, flipped:false, heard:null, heardScore:0, listening:false };
+    state.screen='mock-session'; render(); return;
+  }
+  if(action==='mock-listen'){ startListening(); return; }
+  if(action==='start-quiz-all'){ startQuiz(QUESTIONS); return; }
+  if(action==='flash-all'){ startFlashSession(QUESTIONS, 'all'); return; }
+  if(action==='flash-new'){
+    const unseen = QUESTIONS.filter(q=>!(state.progress[q.id]&&state.progress[q.id].seen>0));
+    startFlashSession(unseen, 'new'); return;
+  }
+  if(action==='flash-cat'){ startFlashSession(QUESTIONS.filter(q=>q.subsection===el.dataset.cat), 'cat'); return; }
+  if(action==='flash-grade'){
+    const sess = state.session;
+    const q = QUESTIONS.find(x=>x.id===sess.list[sess.idx]);
+    recordResult(q.id, el.dataset.ok==='1');
+    sess.idx++; sess.flipped=false; render(); return;
+  }
+  if(action==='mock-grade'){
+    const sess = state.session;
+    const q = QUESTIONS.find(x=>x.id===sess.list[sess.idx]);
+    const ok = el.dataset.ok==='1';
+    recordResult(q.id, ok);
+    if(ok) sess.correct++; else sess.wrong++;
+    sess.idx++; sess.flipped=false; sess.heard=null; sess.heardScore=0; sess.listening=false; render(); return;
+  }
+
+  if(action==='quiz-start'){
+    const n = parseInt(document.getElementById('quiz-count').value,10);
+    const cat = document.getElementById('quiz-cat').value;
+    let pool = cat ? QUESTIONS.filter(q=>q.subsection===cat) : QUESTIONS;
+    startQuiz(pickRandom(pool, Math.min(n, pool.length)));
+    return;
+  }
+  if(action==='quiz-weak'){
+    const weak = QUESTIONS.filter(q=>['bad','warn'].includes(masteryOf(q.id)));
+    startQuiz(weak); return;
+  }
+  if(action==='quiz-answer'){
+    const sess = state.session;
+    const cur = sess.list[sess.idx];
+    if(cur.answered) return;
+    const q = QUESTIONS.find(x=>x.id===cur.id);
+    const picked = cur.opts[parseInt(el.dataset.i,10)];
+    cur.picked = picked; cur.answered = true;
+    const ok = picked===q.en_a[0];
+    if(ok) sess.correct++;
+    recordResult(q.id, ok);
+    render(); return;
+  }
+  if(action==='quiz-next'){ state.session.idx++; render(); return; }
+
+  if(action==='save-personalization'){
+    const p = state.personalization;
+    p.stateName = document.getElementById('p-state').value;
+    const s = STATES.find(x=>x.name===p.stateName);
+    p.capital = s ? s.capital : '';
+    p.senator1 = document.getElementById('p-sen1').value;
+    p.senator2 = document.getElementById('p-sen2').value;
+    p.representative = document.getElementById('p-rep').value;
+    p.governor = document.getElementById('p-gov').value;
+    p.president = document.getElementById('p-president').value;
+    p.vicepresident = document.getElementById('p-vp').value;
+    p.speaker = document.getElementById('p-speaker').value;
+    p.chiefjustice = document.getElementById('p-cj').value;
+    toast('Сохранено');
+    return;
+  }
+  if(action==='reset-progress'){
+    if(confirm('Точно сбросить весь прогресс по вопросам?')){ state.progress = {}; state.streak=0; render(); toast('Прогресс сброшен'); }
+    return;
+  }
+  if(action==='export'){ doExport(); return; }
+}
+
+function doExport(){
+  const payload = {
+    version:1, exportedAt:new Date().toISOString(),
+    progress: state.progress, personalization: state.personalization,
+    streak: state.streak, lastActiveDate: state.lastActiveDate
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'civics-progress-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  toast('Файл прогресса сохранён');
+}
+function handleImport(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.progress) state.progress = data.progress;
+      if(data.personalization) state.personalization = Object.assign(state.personalization, data.personalization);
+      if(typeof data.streak==='number') state.streak = data.streak;
+      if(data.lastActiveDate) state.lastActiveDate = data.lastActiveDate;
+      toast('Прогресс загружен');
+      render();
+    }catch(e){ toast('Не удалось прочитать файл'); }
+  };
+  reader.readAsText(file);
+}
+
+render();
+</script>
+</body>
+</html>

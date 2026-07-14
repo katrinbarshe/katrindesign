@@ -284,6 +284,18 @@ a:hover { color: var(--link); text-decoration: underline; }
 .project-card-bg--top,
 .mini-card-bg--top { object-position: top; }
 
+.project-card--solid {
+  background: linear-gradient(160deg, #101013, #1b1b1b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-card-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.4));
+}
+
 @media (max-width: 700px) {
   .project-grid { grid-template-columns: 1fr; }
 }
@@ -358,6 +370,18 @@ a:hover { color: var(--link); text-decoration: underline; }
 
 .mini-card--light .mini-card-caption { background: rgba(255,255,255,.55); }
 .mini-card--light .mini-card-caption h3 { color: #111; }
+
+.mini-card--solid {
+  background: linear-gradient(160deg, #101013, #1b1b1b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-card-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.4));
+}
 
 .more-projects-next {
   position: absolute;
