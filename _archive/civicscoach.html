@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="ru">
 <head>
+<script>
+  (function () {
+    var stored = localStorage.getItem('theme');
+    var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CivicsCoach — Подготовка к тесту на гражданство США</title>
@@ -27,12 +34,37 @@
       --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
     }
   }
+  :root[data-theme="light"]{
+    --bg:#f7f8fb; --surface:#ffffff; --surface-2:#eef1f7;
+    --text:#1c2130; --text-dim:#5b6272; --border:#e2e5ec;
+    --primary:#2f5fd8; --primary-dim:#e8edfc;
+    --good:#1a8a5f; --good-bg:#e5f6ee;
+    --warn:#b3760a; --warn-bg:#fbeed7;
+    --bad:#c23b3b; --bad-bg:#fbe6e6;
+    --shadow:0 1px 2px rgba(20,24,40,.06), 0 4px 14px rgba(20,24,40,.06);
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161c; --surface:#1c1f28; --surface-2:#242833;
+    --text:#e9ebf1; --text-dim:#a2a7b5; --border:#2c3040;
+    --primary:#7fa0f5; --primary-dim:#232c47;
+    --good:#5fd6a4; --good-bg:#173427;
+    --warn:#f0c169; --warn-bg:#3a2e14;
+    --bad:#f28b8b; --bad-bg:#3a1c1c;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+  }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;}
   .app{max-width:720px;margin:0 auto;padding:16px 16px 90px;}
-  .site-backbar{max-width:720px;margin:0 auto;padding:10px 16px 0;}
+  .site-backbar{max-width:720px;margin:0 auto;padding:10px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;}
   .site-backbar a{color:var(--text-dim);font-size:13px;text-decoration:none;}
   .site-backbar a:hover{color:var(--primary);text-decoration:underline;}
+  .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;border-radius:50%;background:var(--surface-2);color:var(--text-dim);cursor:pointer;flex-shrink:0;}
+  .theme-toggle:hover{color:var(--primary);}
+  .theme-toggle svg{width:16px;height:16px;}
+  .theme-toggle .icon-sun{display:none;}
+  .theme-toggle .icon-moon{display:block;}
+  [data-theme="dark"] .theme-toggle .icon-sun{display:block;}
+  [data-theme="dark"] .theme-toggle .icon-moon{display:none;}
   header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0 14px;}
   header.top h1{font-size:17px;margin:0;font-weight:700;}
   .lang-toggle{display:flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;flex-shrink:0;}
@@ -120,7 +152,13 @@
 </style>
 </head>
 <body>
-<div class="site-backbar"><a href="civicscoach-project.html">&larr; katrindesign.com</a></div>
+<div class="site-backbar">
+  <a href="civicscoach-project.html">&larr; katrindesign.com</a>
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
+</div>
 <div class="app" id="app"></div>
 <div id="toast-holder"></div>
 
@@ -817,6 +855,16 @@ function handleImport(ev){
     }catch(e){ toast('Не удалось прочитать файл'); }
   };
   reader.readAsText(file);
+}
+
+const themeToggle = document.getElementById('theme-toggle');
+if(themeToggle){
+  themeToggle.addEventListener('click', ()=>{
+    const current = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
+    const next = current==='dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
 }
 
 render();
